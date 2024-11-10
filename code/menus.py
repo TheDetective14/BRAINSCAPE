@@ -1263,6 +1263,14 @@ class MathOlympus:
         self.live_image = pygame.image.load(join('images', 'trisha', 'lives.png'))
         self.live_image = pygame.transform.scale(self.live_image, (40, 40))
 
+        self.instructions_bg = pygame.image.load(join('images', 'trisha',"instructions.png"))
+        self.instructions_bg = pygame.transform.scale(self.instructions_bg, (WINDOW_WIDTH, WINDOW_HEIGHT))
+
+        pygame.mixer.music.load("bg_music.mp3")
+        pygame.mixer.music.play(-1) 
+
+
+
         # Set font settings
         self.pixel_font_display = pygame.font.Font(join('fonts', 'Benguiat.ttf'), 50)
         self.pixel_font_feedback = pygame.font.Font(join('fonts', 'Benguiat.ttf'), 70)
@@ -1604,9 +1612,10 @@ class MathOlympus:
         self.fade_in_text(self.display_surface, full_text_surface, pygame.Rect((WINDOW_WIDTH - max_text_width) // 2, text_y, max_text_width, text_block_height), speed=10)
 
         pygame.display.flip()
-        pygame.time.wait(1000) 
+        pygame.time.wait(1000)
+         
         self.fade_out_text(self.display_surface, full_text_surface, pygame.Rect((WINDOW_WIDTH - max_text_width) // 2, text_y, max_text_width, text_block_height), speed=10)
-
+        pygame.event.clear()
         pygame.display.flip()
 
     # START AND END SCREEN
@@ -1642,15 +1651,96 @@ class MathOlympus:
         pygame.display.flip()
         pygame.time.wait(3000)
 
-   # GAME LOOP
+
+        # INSTRUCTIONS 
+    def display_instructions(self):
+        """
+        Displays the instructions screen with a typewriter animation effect and waits for the user to press a key to start.
+        """
+        self.screen.blit(self.instructions_bg, (0, 0))
+
+        instructions_text = [
+            "Prepare to tackle a series of mathematical equations!",
+            "You have to answer 5 questions correctly.",
+            "Use the UP and DOWN arrow keys to select an answer.",
+            "Press ENTER to submit.",
+            "",
+            "Warning: You have only 20 seconds to answer each question!",
+            "You'll start with three lives, but beware: each incorrect answer",
+            "or time-out will cost you a life. If you lose all three lives,",
+            "your trial will end, and you'll forfeit the Fourth Stone of Truth.",
+            "",
+            "Good luck!"
+        ]
+
+        box_width = 600
+        box_height = 450
+        start_x = WINDOW_WIDTH - box_width - 150 
+        start_y = WINDOW_HEIGHT - box_height - 20  
+
+        line_spacing = 25  
+        typing_speed = 30
+
+        current_line = 0
+        current_char = 0
+        last_update = pygame.time.get_ticks()
+        typing_finished = False
+
+        waiting = True
+        while waiting:
+            now = pygame.time.get_ticks()
+
+            if now - last_update > typing_speed and not typing_finished:
+                last_update = now  
+
+                if current_line < len(instructions_text):  
+                    if current_char < len(instructions_text[current_line]):
+                        current_char += 1
+                    else:
+                        current_line += 1
+                        current_char = 0
+
+                if current_line >= len(instructions_text):
+                    typing_finished = True
+
+                self.screen.blit(self.instructions_bg, (0, 0))
+
+                y_offset = start_y
+                for line_num in range(min(current_line + 1, len(instructions_text))):
+                    line_text = instructions_text[line_num][:current_char] if line_num == current_line else instructions_text[line_num]
+                    text_surface = self.pixel_font_instructions.render(line_text, True, self.white_text_color)
+                    text_rect = text_surface.get_rect(center=(start_x + box_width // 2, y_offset))
+                    self.screen.blit(text_surface, text_rect)
+                    y_offset += line_spacing
+
+            if typing_finished:
+                start_prompt = "Press any key to start"
+                start_prompt_surface = self.pixel_font_instructions.render(start_prompt, True, self.blue_text_color)
+                start_prompt_rect = start_prompt_surface.get_rect(center=(start_x + box_width // 2, WINDOW_HEIGHT - 180))
+                self.screen.blit(start_prompt_surface, start_prompt_rect)
+
+            pygame.display.flip()
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    waiting = False
+                if event.type == pygame.KEYDOWN and typing_finished:
+                    waiting = False
+
+
+    #GAME LOOP
     def run_game_loop(self):
         """ 
         Main game loop where questions are presented, player input is processed, 
         and scores and lives are updated based on player's responses. 
         """
+        # Start the timer when the first question appears
+        self.start_time = pygame.time.get_ticks()
+
         while self.is_running:
             # Display background, lives, score, and timer.
-            self.display_surface.blit(self.question_bg_image, (0, 0))
+            self.screen.blit(self.question_bg_image, (0, 0))
             self.draw_lives()
             self.draw_score()
 
@@ -1665,7 +1755,7 @@ class MathOlympus:
             if self.current_question_index >= self.total_questions or self.lives_count <= 0:
                 break
 
-            # Get the current questions and options.
+            # Get the current question and options.
             question_data = self.questions[self.current_question_index]
             question_text = question_data["question"]
             clue_text = question_data["clue"]
@@ -1674,17 +1764,17 @@ class MathOlympus:
             # Display background, lives, and score.
             text_area_rect = pygame.Rect((WINDOW_WIDTH - 900) // 2, (WINDOW_HEIGHT - 300) // 2, 900, 500)
             question_rect = pygame.Rect(text_area_rect.x, text_area_rect.y, text_area_rect.width, 120)
-            self.draw_wrapped_text(self.display_surface, question_text, self.pixel_font_large, self.white_text_color, question_rect)
+            self.draw_wrapped_text(self.screen, question_text, self.pixel_font_large, self.white_text_color, question_rect)
 
             clue_rect = pygame.Rect(text_area_rect.x, question_rect.bottom + 5, text_area_rect.width, 30)
-            self.draw_wrapped_text(self.display_surface, f"Clue: {clue_text}", self.pixel_font_small, self.clue_text_color, clue_rect)
+            self.draw_wrapped_text(self.screen, f"Clue: {clue_text}", self.pixel_font_small, self.clue_text_color, clue_rect)
 
             option_start_y = clue_rect.bottom + 40
             for i, option in enumerate(options):
                 alpha = 255 if i == self.selected_option else 100
                 color = self.blue_text_color if i == self.selected_option else self.faded_text_color
                 option_rect = pygame.Rect(text_area_rect.x, option_start_y + i * 50, text_area_rect.width, 30)
-                self.draw_centered_text(self.display_surface, option, self.pixel_font_large, color, option_rect, alpha)
+                self.draw_centered_text(self.screen, option, self.pixel_font_large, color, option_rect, alpha)
 
             # Handle player input.
             for event in pygame.event.get():
@@ -1713,9 +1803,13 @@ class MathOlympus:
 
         self.display_end_screen(self.lives_count > 0 and self.score >= self.total_questions)
 
+    def stop_music(self):
+        pygame.mixer.music.stop()
+
     def run(self):
         self.fade_transition()
         self.start_screen()  # Show start screen
+        self.display_instructions()
         self.fade_transition()
         self.run_game_loop()  # Start the game loop
         self.fade_transition()
