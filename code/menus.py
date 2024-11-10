@@ -145,7 +145,7 @@ class Library:
 
             if self.player.hitbox_rect.colliderect(self.collide_points['maze']):
                 self.gameStateManager.set_state('Maze')
-                SequenceSurge(self.display_surface, self.gameStateManager).run()
+                Maze(self.display_surface, self.gameStateManager).run()
             if self.player.hitbox_rect.colliderect(self.collide_points['locked']):
                 self.reject_access()
                 self.gameStateManager.set_state('Library')
@@ -724,7 +724,517 @@ class JumbleMania:
                     running = False
 
 class MapMaestros:
-    pass
+    class PartOne:
+        class MainMenu:
+            def __init__(self, display, gameStateManager):
+                # Initialize Pygame
+                pygame.init()
+                self.gameStateManager = gameStateManager
+
+                # Screen dimensions
+                self.screen_width = 1280
+                self.screen_height = 720
+                self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
+                pygame.display.set_caption("Starry Background")
+
+                # Load videos
+                self.video_clip = cv2.VideoCapture(join('images', 'josh', 'star_backs.mp4'))
+                self.fps = self.video_clip.get(cv2.CAP_PROP_FPS)      # OpenCV v2.x used "CV_CAP_PROP_FPS"
+                self.frame_count = int(self.video_clip.get(cv2.CAP_PROP_FRAME_COUNT))
+                self.video_duration = self.frame_count/self.fps
+                ret, frame = self.video_clip.read()
+                self.first_frame = frame
+                self.video_width, self.video_height = self.first_frame.shape[:2]
+                self.screen_aspect_ratio = self.screen_width / self.screen_height
+                self.video_aspect_ratio = self.video_width / self.video_height
+                self.zoom_factor = 1.0
+                self.current_frame = 0
+                self.frame_time = 0
+
+                # Load button images
+                self.start_button_image = pygame.image.load(join('images', 'josh', 'start_button.png')).convert_alpha()
+                self.exit_button_image = pygame.image.load(join('images', 'josh', 'exit_button.png')).convert_alpha()
+                self.start_button_image = pygame.transform.scale(self.start_button_image, (self.start_button_image.get_width() // 3, self.start_button_image.get_height() // 3))
+                self.exit_button_image = pygame.transform.scale(self.exit_button_image, (self.exit_button_image.get_width() // 3, self.exit_button_image.get_height() // 3))
+
+                # Set button positions
+                self.start_button_rect = self.start_button_image.get_rect(center=(self.screen_width // 2 - 15, self.screen_height // 2 + 150))
+                self.exit_button_rect = self.exit_button_image.get_rect(center=(self.screen_width // 2 - 15, self.screen_height // 2 + 250))
+
+                # Load and play background music
+                pygame.mixer.music.load(join('audio', 'BGM', 'main_menusound.mp3'))
+                pygame.mixer.music.play(-1)  # Play on a loop
+
+            def run(self):
+                # Game loop
+                running = True
+                while running:
+                    # Handle events
+                    for event in pygame.event.get():
+                        if event.type == pygame.QUIT:
+                            running = False
+                        if event.type == pygame.MOUSEBUTTONDOWN:
+                            if self.start_button_rect.collidepoint(event.pos):
+                                instructions = MapMaestros.PartOne.Instructions(self.gameStateManager)
+                                instructions.run_game()
+                                running = False 
+                            if self.exit_button_rect.collidepoint(event.pos):
+                                running = False
+
+                    # Update the frame (for all screens)
+                    current_time = pygame.time.get_ticks() / 1000
+                    if current_time - self.frame_time >= self.video_duration / (self.fps * 12):
+                        self.current_frame = (self.current_frame + 1) % int(self.video_duration * self.fps)
+                        self.frame_time = current_time
+                        ret, frame = self.video_clip.read()
+                        video_surface = pygame.transform.scale(
+                            pygame.surfarray.make_surface(frame.astype('uint8')),
+                            (int(self.video_width * self.zoom_factor), int(self.video_height * self.zoom_factor))
+                        )
+                        video_surface = pygame.transform.flip(video_surface, True, False)
+                        video_surface = pygame.transform.rotate(video_surface, 90)
+                        x_offset = (self.screen_width - video_surface.get_width()) // 2
+                        y_offset = (self.screen_height - video_surface.get_height()) // 2
+
+                    # Draw background
+                    self.screen.blit(video_surface, (x_offset, y_offset))
+
+                    # Draw buttons
+                    self.screen.blit(self.start_button_image, self.start_button_rect)
+                    self.screen.blit(self.exit_button_image, self.exit_button_rect)
+
+                    # Update the display
+                    pygame.display.flip()
+
+                # Quit Pygame
+                pygame.quit()
+
+        class Instructions:
+            def __init__(self, gameStateManager):
+                # Initialize Pygame
+                pygame.init()
+                self.gameStateManager = gameStateManager
+
+                # Screen dimensions
+                self.screen_width = 1280
+                self.screen_height = 720
+                self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
+                pygame.display.set_caption("Map Maestros - Instructions")
+
+                # Load images
+                self.background_image = pygame.image.load(join('images', 'josh', 'instructions.png')).convert()
+                self.next_button_image = pygame.image.load(join('images', 'josh', "next_button.png")).convert_alpha()
+
+                # Resize the "next_button" image (adjust the dimensions as needed)
+                self.next_button_image = pygame.transform.scale(self.next_button_image, (300, 200))
+
+                # Set button position
+                self.next_button_rect = self.next_button_image.get_rect(bottomright=(self.screen_width - 20, self.screen_height - 20))
+
+                # Load and convert images to PNG format
+                self.blue_box_image = pygame.image.load(join('images', 'josh', "map_text2.png")).convert_alpha()
+                self.blue_box_image = pygame.transform.scale(self.blue_box_image, (500,300))
+                self.red_box_image = pygame.image.load(join('images', 'josh', "map_text1.png")).convert_alpha()
+                self.red_box_image = pygame.transform.scale(self.red_box_image, (600,300))
+
+                # Set box positions (center on the screen)
+                self.blue_box_rect = self.blue_box_image.get_rect(center=(self.screen_width // 2, self.screen_height // 2 + 50))
+                self.red_box_rect = self.red_box_image.get_rect(center=(self.screen_width // 2, self.screen_height // 2 + 40))
+
+                # Set box visibility
+                self.show_blue_box = True
+                self.show_red_box = False
+
+                self.next_button_clicked = 0
+
+            def run_game(self):
+                # Game loop
+                running = True
+                while running:
+                    for event in pygame.event.get():
+                        if event.type == pygame.QUIT:
+                            running = False
+                        if event.type == pygame.MOUSEBUTTONDOWN:
+                            if self.next_button_rect.collidepoint(event.pos):
+                                self.next_button_clicked += 1
+                                print("Next button clicked!")
+                                self.show_blue_box = not self.show_blue_box
+                                self.show_red_box = not self.show_red_box
+                                if self.next_button_clicked == 2:
+                                    # Stop background music
+                                    pygame.mixer.music.stop()
+
+                                    # Start the PartTwo class
+                                    countdown_screen = MapMaestros.PartTwo.CountdownScreen(self.gameStateManager)
+                                    countdown_screen.run()
+                                    self.transition_to_countdown()
+                                    running = False
+
+                    # Display the background image
+                    self.screen.blit(self.background_image, (0, 0))
+
+                    # Draw the appropriate box
+                    if self.show_blue_box:
+                        self.screen.blit(self.blue_box_image, self.blue_box_rect)
+                    elif self.show_red_box:
+                        self.screen.blit(self.red_box_image, self.red_box_rect)
+
+                    # Display the "Next" button
+                    self.screen.blit(self.next_button_image, self.next_button_rect)
+
+                    # Update the display
+                    pygame.display.flip()
+
+                pygame.quit()
+
+            def transition_to_countdown(self):
+                # Fade out the current screen
+                fade_out_speed = 10
+                for alpha in range(255, 0, -fade_out_speed):
+                    self.screen.fill((0, 0, 0, alpha))
+                    pygame.display.flip()
+                    time.sleep(0.01)
+
+                # Start the PartTwo class
+                countdown_screen = MapMaestros.PartTwo.CountdownScreen()
+                countdown_screen.run()
+
+    # Part Two: Countdown Screen
+    class PartTwo:
+        class CountdownScreen:
+            def __init__(self, gameStateManager):
+                # Initialize Pygame
+                pygame.init()
+                self.gameStateManager = gameStateManager
+
+                # Screen dimensions
+                self.screen_width = 1280
+                self.screen_height = 720
+                self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
+                pygame.display.set_caption("Countdown")
+
+                # Load countdown image
+                self.countdown_image = pygame.image.load(join('images', 'josh', "countdown.png")).convert_alpha()
+
+                # Set initial countdown value
+                self.countdown_value = 3
+
+                # Load and play countdown music
+                self.countdown_music = pygame.mixer.Sound(join('audio', 'SFX', "countdown_sound.mp3"))
+                self.countdown_music.play()
+
+            def run(self):
+                # Game loop
+                running = True
+                while running:
+                    # Handle events
+                    for event in pygame.event.get():
+                        if event.type == pygame.QUIT:
+                            running = False
+
+                    # Update countdown
+                    self.countdown_value -= 1
+                    if self.countdown_value == 0:
+                        running = False
+
+                    # Draw countdown image
+                    self.screen.blit(self.countdown_image, (0, 0))
+
+                    # Update the display
+                    pygame.display.flip()
+
+                    # Wait for a short time
+                    time.sleep(1)
+
+                # Quit Pygame
+                pygame.quit()
+
+
+        def transition_to_countdown(self):
+            # Fade out the current screen
+            fade_out_speed = 5  # Lower value for faster fade
+            for alpha in range(255, 0, -fade_out_speed):
+                self.screen.fill((0, 0, 0, alpha))  # Fill with black and alpha
+                pygame.display.flip()
+                time.sleep(0.3)  # Adjust sleep duration for fade speed
+
+            # Start the PartTwo class
+            countdown_screen = MapMaestros.PartTwo.CountdownScreen(self.gameStateManager)  # Directly start PartTwo
+            countdown_screen.run()
+
+    class PartTwo:
+        class CountdownScreen:
+            def __init__(self, gameStateManager):
+                pygame.init()
+                self.gameStateManager = gameStateManager
+                self.screen = pygame.display.set_mode((1280, 720))
+                pygame.display.set_caption("Countdown")
+
+                self.screen_width, self.screen_height = self.screen.get_size()
+                self.background_image = pygame.image.load(join('images', 'josh', 'actual_laro.png')).convert_alpha()
+                self.background_image = pygame.transform.scale(self.background_image, (1280, 720))
+
+                # Load the PNG images for countdown numbers
+                self.number_three = pygame.image.load(join('images', 'josh', 'number_three.png')).convert_alpha()
+                self.number_two = pygame.image.load(join('images', 'josh', 'number_two.png')).convert_alpha()
+                self.number_one = pygame.image.load(join('images', 'josh', 'number_one.png')).convert_alpha()
+
+                # Resize countdown images to be smaller
+                self.number_three = pygame.transform.scale(self.number_three, (300, 300))  # Adjust size here
+                self.number_two = pygame.transform.scale(self.number_two, (390, 300))      # Adjust size here
+                self.number_one = pygame.transform.scale(self.number_one, (300, 300))      # Adjust size here
+                pygame.mixer.init()
+                self.music = pygame.mixer.music.load(join('audio', 'SFX', 'count_downmusic.mp3'))
+            def display_countdown(self):
+                countdown_images = [self.number_three, self.number_two, self.number_one]
+                for img in countdown_images:
+                    self.screen.blit(self.background_image, (0, 0))  # Blit background
+                    img_rect = img.get_rect(center=(self.screen_width // 2, self.screen_height // 2 + 50))  # Adjust position lower
+                    self.screen.blit(img, img_rect)  # Blit countdown image
+                    pygame.display.flip()
+                    pygame.time.wait(1000)  # Wait for 1 second
+
+            def run(self):
+                pygame.mixer.music.play()
+                pygame.mixer.init()
+                self.display_countdown()
+
+                game = MapMaestros.PartThree.ContinentMatchGame(self.gameStateManager)
+                game.run()    
+
+    class PartThree:        
+        class ContinentMatchGame:
+            def __init__(self, gameStateManager):
+                pygame.init()
+                self.screen = pygame.display.set_mode((1280, 720))
+                self.gameStateManager = gameStateManager
+                pygame.display.set_caption("Continent Match")
+
+                self.screen_width, self.screen_height = self.screen.get_size()
+                self.background_image = pygame.image.load(join('images', 'josh', 'actual_game.png')).convert_alpha()
+                self.background_image = pygame.transform.scale(self.background_image, (1280, 720))
+
+                self.box_image = pygame.image.load(join('images', 'josh', 'the_box.png')).convert_alpha()
+                self.box_image = pygame.transform.scale(self.box_image, (self.screen_width, self.screen_height))
+                
+                self.box_width, self.box_height = 180, 160
+                self.ice_cube_image = pygame.image.load(join('images', 'josh', 'ice_cube.png')).convert_alpha()
+                self.ice_cube_image = pygame.transform.scale(self.ice_cube_image, (self.box_width, self.box_height))
+
+            
+
+                self.gap_x, self.gap_y = 10, 10
+                self.time_limit = 30
+
+                # Define colors
+                self.dark_blue = (0, 0, 139)           # Dark blue for timer and score text
+                self.dark_cyan = (0, 139, 139)         # Dark cyan for continent and country text
+
+                # Load fonts
+                self.font = pygame.font.Font(join('fonts', 'Benguiat.ttf'), 36)
+                self.small_font = pygame.font.Font(join('fonts', 'Benguiat.ttf'), 28)
+                self.timer_font = pygame.font.Font(join('fonts', 'Benguiat.ttf'), 32)
+
+                self.countries = [
+        ("Brazil", "South America"), ("Nigeria", "Africa"), ("China", "Asia"), 
+        ("France", "Europe"), ("Australia", "Oceania"), ("Canada", "North America"), 
+        ("Antarctica", "Antarctica"), ("Argentina", "South America"), ("Kenya", "Africa"), 
+        ("Japan", "Asia"), ("Germany", "Europe"), ("New Zealand", "Oceania"),
+        ("United States", "North America"), ("Chile", "South America"), ("Egypt", "Africa"), 
+        ("India", "Asia"), ("Italy", "Europe"), ("Fiji", "Oceania"), ("Mexico", "North America"),
+        ("Peru", "South America"), ("South Africa", "Africa"), ("Thailand", "Asia"), 
+        ("United Kingdom", "Europe"), ("Papua New Guinea", "Oceania"), ("Cuba", "North America"),
+        ("Colombia", "South America"), ("Ethiopia", "Africa"), ("Russia", "Asia"), 
+        ("Spain", "Europe"), ("Philippines", "Asia"), ("Iceland", "Europe"), 
+        ("Jamaica", "North America"), ("Uruguay", "South America"), ("Turkey", "Asia"), 
+        ("Saudi Arabia", "Asia"), ("Portugal", "Europe"), ("Venezuela", "South America"),
+        ("Indonesia", "Asia"), ("Algeria", "Africa"), ("Poland", "Europe"), ("Iran", "Asia"),
+        ("Morocco", "Africa"), ("Vietnam", "Asia"), ("Belgium", "Europe"), ("Pakistan", "Asia"),
+        ("Sudan", "Africa"), ("Sweden", "Europe"), ("Malaysia", "Asia"), ("Netherlands", "Europe"),
+        ("Ecuador", "South America"), ("Ghana", "Africa"), ("Romania", "Europe"), ("Bangladesh", "Asia"),
+        ("Myanmar", "Asia"), ("South Korea", "Asia"), ("Czech Republic", "Europe"), ("Kazakhstan", "Asia"),
+        ("Ukraine", "Europe"), ("Hungary", "Europe"), ("Tanzania", "Africa"), ("Cameroon", "Africa"),
+        ("Afghanistan", "Asia"), ("Mozambique", "Africa"), ("United Arab Emirates", "Asia"), ("Singapore", "Asia")
+    ]
+
+                self.reset_game()
+
+                # Load PNG images
+                self.try_again_image = pygame.image.load(join('images', 'josh', 'try_again.png')).convert_alpha()
+                # Assuming 1cm = 37.7953 pixels (approximately)
+                self.try_again_image = pygame.transform.scale(self.try_again_image, (int(10 * 37.7953), int(10 * 37.7953)))  
+                self.exit_button_image = pygame.image.load(join('images', 'josh', 'exit_button.png')).convert_alpha()
+                self.exit_button_image = pygame.transform.scale(self.exit_button_image, (200, 90))
+                self.you_won_image = pygame.image.load(join('images', 'josh', 'you_won.png')).convert_alpha()
+                self.you_won_image = pygame.transform.scale(self.you_won_image, (self.screen_width // 2, self.screen_height // 2))
+
+            def reset_game(self):
+                random.shuffle(self.countries)
+                self.country_list = self.countries.copy()
+                self.selected_country, self.correct_continent = self.country_list.pop()
+                self.score = 0
+                self.dragging = False
+                self.game_start_time = time.time()
+                self.running = True
+                self.show_try_again = False
+
+                top_row_start_x = (self.screen_width - (4 * 150 + 3 * self.gap_x)) // 2
+                bottom_row_start_x = (self.screen_width - (3 * 150 + 2 * self.gap_x)) // 2
+                top_row_y = (self.screen_height - 2 * 140 - self.gap_y) // 2
+                bottom_row_y = top_row_y + 140 + self.gap_y
+                
+                self.continents = {
+                    "Africa": pygame.Rect(top_row_start_x, top_row_y, 150, 140),
+                    "Asia": pygame.Rect(top_row_start_x + (150 + self.gap_x), top_row_y, 150, 140),
+                    "Europe": pygame.Rect(top_row_start_x + 2 * (150 + self.gap_x), top_row_y, 150, 140),
+                    "North America": pygame.Rect(top_row_start_x + 3 * (150 + self.gap_x), top_row_y, 150, 140),
+                    "South America": pygame.Rect(bottom_row_start_x, bottom_row_y, 150, 140),
+                    "Oceania": pygame.Rect(bottom_row_start_x + (150 + self.gap_x), bottom_row_y, 150, 140),
+                    "Antarctica": pygame.Rect(bottom_row_start_x + 2 * (150 + self.gap_x), bottom_row_y, 150, 140)
+                }
+
+                self.country_rect = pygame.Rect((self.screen_width - self.box_width) // 2, bottom_row_y + 140 + self.gap_y, self.box_width, self.box_height)
+                self.country_rect_original_pos = self.country_rect.topleft
+                # Assuming 1cm = 37.7953 pixels (approximately)
+                self.try_again_button = pygame.Rect((self.screen_width // 2 - int(10 * 37.7953) // 2), self.screen_height // 2 - int(10 * 37.7953) // 2, int(10 * 37.7953), int(10 * 37.7953))  
+                self.exit_button = pygame.Rect((self.screen_width - 200) // 2, self.screen_height // 2 + 120, 200, 50) # Moved exit button down
+
+                self.timer_x = self.country_rect.x - 200
+                self.score_x = self.country_rect.x + self.country_rect.width + 50
+                self.text_y = self.country_rect.y
+
+            def get_fitting_font(self, text, rect_width, rect_height, max_font_size=48):
+                fitting_font = pygame.font.Font(join('fonts', 'Benguiat.ttf'), max_font_size)
+                while fitting_font.size(text)[0] > rect_width - 10 or fitting_font.size(text)[1] > rect_height - 10:
+                    max_font_size -= 2
+                    fitting_font = pygame.font.Font(join('fonts', 'Benguiat.ttf'), max_font_size)
+                return fitting_font
+
+            def run(self):
+                
+                while self.running:
+                    self.screen.blit(self.background_image, (0, 0))
+                    current_time = time.time()
+                    elapsed_time = current_time - self.game_start_time
+                    remaining_time = max(0, self.time_limit - int(elapsed_time))
+
+                    # Check win condition
+                    if self.score >= 10:
+                        self.display_win_screen()
+                        # Wait for 3 seconds then break the loop
+                        pygame.time.delay(3000)
+                        break
+                    # Check lose condition
+                    elif remaining_time == 0:
+                        self.display_lose_screen()
+                        self.show_try_again = True
+
+                    self.handle_events()
+                    self.draw_continents()
+                    self.draw_country()
+                    self.draw_timer_and_score(remaining_time)
+
+                    # Only draw the "Try Again" button if the player has lost
+                    if self.show_try_again:
+                        self.draw_try_again_button()
+
+                    pygame.display.flip()
+
+            def handle_events(self):
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        exit()
+                    # Handle "Try Again" button click
+                    if self.show_try_again and event.type == pygame.MOUSEBUTTONDOWN and self.try_again_button.collidepoint(event.pos):
+                        # Reset the game
+                        self.reset_game() 
+                    # Handle game events
+                    if event.type == pygame.MOUSEBUTTONDOWN and not self.show_try_again:
+                        if self.country_rect.collidepoint(event.pos):
+                            self.dragging = True
+                    if event.type == pygame.MOUSEBUTTONUP:
+                        if self.dragging:
+                            self.dragging = False
+                            if self.continents[self.correct_continent].colliderect(self.country_rect):
+                                self.score += 1
+                            if not self.country_list:
+                                self.reset_game()
+                            else:
+                                self.selected_country, self.correct_continent = self.country_list.pop()
+                            self.country_rect.topleft = self.country_rect_original_pos
+                        # Remove the "Try Again" button after the player clicked it
+                        if self.show_try_again:
+                            self.show_try_again = False
+                    if event.type == pygame.MOUSEMOTION and self.dragging:
+                        self.country_rect.x += event.rel[0]
+                        self.country_rect.y += event.rel[1]
+
+            def draw_country(self):
+                self.screen.blit(self.ice_cube_image, self.country_rect.topleft)
+                country_font = self.get_fitting_font(self.selected_country, self.country_rect.width, self.country_rect.height, max_font_size=48)
+                country_text = country_font.render(self.selected_country, True, self.dark_cyan)
+                country_text_rect = country_text.get_rect(center=self.country_rect.center)
+                self.screen.blit(country_text, country_text_rect)
+
+            def draw_continents(self):
+                for continent, rect in self.continents.items():
+                    self.screen.blit(pygame.transform.scale(self.box_image, (150, 140)), rect)
+                    continent_font = self.get_fitting_font(continent, rect.width, rect.height, max_font_size=28)
+                    continent_text = continent_font.render(continent, True, self.dark_cyan)
+                    continent_text_rect = continent_text.get_rect(center=rect.center)
+                    self.screen.blit(continent_text, continent_text_rect)
+
+            def draw_timer_and_score(self, remaining_time):
+                timer_text = self.timer_font.render(f"Time: {remaining_time}", True, self.dark_blue)
+                self.screen.blit(timer_text, (self.timer_x, self.text_y))
+                score_text = self.timer_font.render(f"Score: {self.score}", True, self.dark_blue)
+                self.screen.blit(score_text, (self.score_x, self.text_y))
+
+            def display_text(self, message, font, color=(255, 0, 0)):
+                text_surface = font.render(message, True, color)
+                text_rect = text_surface.get_rect(center=(self.screen_width // 2, self.screen_height // 2))
+                self.screen.blit(text_surface, text_rect)
+                pygame.display.flip()
+
+            def draw_try_again_button(self):
+                self.screen.blit(self.try_again_image, self.try_again_button.topleft)
+
+            def display_win_screen(self):
+                # Display "YOU WON!" message
+                self.screen.blit(self.you_won_image, (self.screen_width // 2 - self.you_won_image.get_width() // 2, self.screen_height // 2 - self.you_won_image.get_height() // 2)) 
+                # Draw button
+                self.screen.blit(self.exit_button_image, self.exit_button.topleft)
+                pygame.display.flip()
+
+                # Wait for user to click Exit button
+                while True:
+                    for event in pygame.event.get():
+                        if event.type == pygame.QUIT:
+                            pygame.quit()
+                            exit()
+                        if event.type == pygame.MOUSEBUTTONDOWN:
+                            if self.exit_button.collidepoint(event.pos):
+                                Maze(self.screen, self.gameStateManager).run()
+            def display_lose_screen(self):
+                # Draw buttons
+                self.screen.blit(self.try_again_image, self.try_again_button.topleft)
+                self.screen.blit(self.exit_button_image, self.exit_button.topleft)
+                pygame.display.flip()
+
+                # Wait for user to click a button
+                while True:
+                    for event in pygame.event.get():
+                        if event.type == pygame.QUIT:
+                            pygame.quit()
+                            exit()
+                        if event.type == pygame.MOUSEBUTTONDOWN:
+                            if self.try_again_button.collidepoint(event.pos):
+                                self.reset_game()
+                                return
+                            elif self.exit_button.collidepoint(event.pos):
+                                Maze(self.screen, self.gameStateManager).run()
+                    pygame.quit()
 
 class MathOlympus:
     def __init__(self, display, gameStateManager):
