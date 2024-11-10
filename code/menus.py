@@ -145,7 +145,7 @@ class Library:
 
             if self.player.hitbox_rect.colliderect(self.collide_points['maze']):
                 self.gameStateManager.set_state('Maze')
-                Maze(self.display_surface, self.gameStateManager).run()
+                SequenceSurge(self.display_surface, self.gameStateManager).run()
             if self.player.hitbox_rect.colliderect(self.collide_points['locked']):
                 self.reject_access()
                 self.gameStateManager.set_state('Library')
@@ -763,7 +763,9 @@ class SequenceSurge:
         # Load background images and fonts
         self.background_image = pygame.image.load(join('images', 'zuri', 'background.png'))
         self.menu = pygame.image.load(join('images', 'zuri', 'main_menu.png'))
-        self.stone_slate =pygame.image.load(join('images', 'zuri', 'stone_slate.png'))
+        
+        self.music = pygame.mixer.Sound(join('audio', 'BGM', 'SS_music.mp3'))
+        self.music.play(loops = -1)
         
         self.pixel_font_display = pygame.font.Font(join('fonts','Benguiat.ttf'), 40)
         self.pixel_font_large = pygame.font.Font(join('fonts','Benguiat.ttf'), 28)
@@ -799,26 +801,26 @@ class SequenceSurge:
         self.display.blit(text_surface, position)
 
     # Draw button method
-    def draw_button(self, rect, text):
-        button_text = self.pixel_font_small.render(text, True, 'white')
+    def draw_button(self, rect, text,):
+        button_text = self.pixel_font_large.render(text, True, 'white')
         self.display.blit(button_text, (rect.x + (rect.width - button_text.get_width()) // 2, 
                                        rect.y + (rect.height - button_text.get_height()) // 2))
 
     def show_sequence(self, sequence, interval):
         for number in sequence:
             self.display.blit(self.background_image, (0, 0))
-            self.display.blit(self.stone_slate, (230, 110))
+            
             self.display_text(str(number), (WINDOW_WIDTH // 2 - 20, WINDOW_HEIGHT // 2 - 20))
             pygame.display.update()
             time.sleep(interval)
             self.display.blit(self.background_image, (0, 0))
-            self.display.blit(self.stone_slate, (230, 110))
+            
             pygame.display.update()
             time.sleep(0.5)
 
     def display_correct_sequence(self, sequence):
         self.display.blit(self.background_image, (0, 0))
-        self.display.blit(self.stone_slate, (230, 110))
+        
         self.display_text("Correct Sequence:", (WINDOW_WIDTH // 2 - 150, WINDOW_HEIGHT // 2 - 50))
 
         x_start = WINDOW_WIDTH // 2 - (len(sequence) * 50) // 2  # Center the numbers
@@ -843,7 +845,7 @@ class SequenceSurge:
 
         while input_active and len(player_sequence) < sequence_length:
             self.display.blit(self.background_image, (0, 0))
-            self.display.blit( self.stone_slate, (230, 110))
+            
             self.display_text(f"Enter number {len(player_sequence) + 1}/{sequence_length}:", 
                               (WINDOW_WIDTH // 2 - 100, WINDOW_HEIGHT // 2 - 100), self.pixel_font_small)
             pygame.draw.rect(self.display, 'white', input_box)
@@ -899,15 +901,84 @@ class SequenceSurge:
             if player_input[i] == correct_sequence[i]:
                 correct_count += points_per_correct
         return correct_count
+    
+    def draw_paragraph(self, text, position, font, line_spacing=5):
+        
+    # Split the text by '\n' to get manual line breaks
+        lines = text.split('\n')
+    
+        x, y = position
+        line_height = font.get_linesize() + line_spacing  # Calculate height including extra line spacing
+
+        for line in lines:
+            line_surface = font.render(line, True, 'white')  # Render the line
+            self.display.blit(line_surface, (x, y))          # Draw the line
+            y += line_height                                 # Move down for the next line
+        
+
+
+        
+
+    def show_ready_screen(self):
+        """Display a ready screen with a 'Ready' button."""
+        
+        
+        
+                        
+                        
+        # Show the background image
+        self.display.blit(self.background_image, (0, 0))
+        
+         # Draw the paragraph on screen
+        instructions = ("You will be flashed 4 numbers for a brief period of time.\n"
+                        
+                        "You must memorize the numbers and their order\n"
+                        
+                        "and input them one by one in order to score points.\n" 
+                        
+                        "You must go through a total of five rounds.\n" 
+                        "Each round increases in difficulty.\n" 
+                        
+                        "The time intervals between each number will grow shorter,\n" 
+                        
+                        "while requiring you to memorize more and more numbers.\n" 
+                        
+                        "Your score will be totaled at the end of 5 rounds.\n"
+                        
+                        "If it does not reach the minimum of 20,\n"
+                        "Good luck.\n")
+                    
+        self.draw_paragraph(instructions, (380 ,200), self.pixel_font_small)
+        
+
+               
+        
+        # Draw 'Ready' button
+        button_rect = pygame.Rect(WINDOW_WIDTH // 2 - 75, WINDOW_HEIGHT // 2 + 140, 150, 50)
+        self.draw_button(button_rect, "Click 'Ready'")
+        
+        pygame.display.update()
+        
+        # Wait for the player to click the 'Ready' button
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    if button_rect.collidepoint(event.pos):
+                        return  # Proceed to the main game
+
 
     def main_menu(self):
         self.display.blit(self.menu, (0, 0))
-        self.display_text("Sequence Surge!", (WINDOW_WIDTH // 2 - 180, WINDOW_HEIGHT // 2 - 100))
+        
+        
         self.display_text(f"Previous Score: {self.previous_score}", (WINDOW_WIDTH // 2 -550, WINDOW_HEIGHT // 2 + 200), self.pixel_font_small)
         self.display_text(f"High Score: {self.high_score}", (WINDOW_WIDTH // 2 - 550, WINDOW_HEIGHT // 2 + 250), self.pixel_font_small)
 
-        start_button = pygame.Rect(WINDOW_WIDTH // 2 - 100, WINDOW_HEIGHT // 2, 200, 50)
-        exit_button = pygame.Rect(WINDOW_WIDTH // 2 - 100, WINDOW_HEIGHT // 2 + 100, 200, 50)
+        start_button = pygame.Rect(WINDOW_WIDTH // 2 - 100, WINDOW_HEIGHT // 2 + 100, 200, 50)
+        exit_button = pygame.Rect(WINDOW_WIDTH // 2 - 100, WINDOW_HEIGHT // 2 + 200, 200, 50)
 
         self.draw_button(start_button, "Start")
         self.draw_button(exit_button, "Exit")
@@ -923,9 +994,12 @@ class SequenceSurge:
                     if start_button.collidepoint(event.pos):
                         self.fade_transition()  
                         self.fade_out()
+                        self.show_ready_screen()
                         return True
                     elif exit_button.collidepoint(event.pos):
                         Maze(self.display, self.gameStateManager).run()
+    
+    
 
     def run(self):
         """Main function of the game.
@@ -949,7 +1023,7 @@ class SequenceSurge:
 
             while running and round_num <= 5:
                 self.display.blit(self.background_image, (0,0))
-                self.display.blit( self.stone_slate, (230, 110))
+                
                 
                 self.display_text(f"Round {round_num}", (WINDOW_WIDTH // 2 - 80, WINDOW_HEIGHT // 2 - 20))
                 pygame.display.update()
@@ -957,7 +1031,7 @@ class SequenceSurge:
 
                 if round_num == 3:
                     self.display.blit(self.background_image, (0,0))
-                    self.display.blit( self.stone_slate, (230, 110))
+                    
                     self.display_text("Sequence increases by one!", (WINDOW_WIDTH // 2 - 150, WINDOW_HEIGHT // 2 - 40), self.pixel_font_small)
                     self.display_text("Double digit numbers will now be included!", (WINDOW_WIDTH // 2 - 250, WINDOW_HEIGHT // 2 + 40), self.pixel_font_small)
                     self.display_text("Two points each correct answer!", (WINDOW_WIDTH // 2 - 200, WINDOW_HEIGHT // 2 ), self.pixel_font_small)
@@ -965,7 +1039,7 @@ class SequenceSurge:
                     time.sleep(4)
                 if round_num == 5:
                     self.display.blit(self.background_image, (0,0))
-                    self.display.blit( self.stone_slate, (230, 110))
+                    
                     self.display_text("Sequence increases by one!", (WINDOW_WIDTH // 2 - 150, WINDOW_HEIGHT // 2 - 40), self.pixel_font_small)
                     self.display_text("Special number included!", (WINDOW_WIDTH // 2 - 150, WINDOW_HEIGHT // 2 + 40), self.pixel_font_small)
                     self.display_text("Three points each correct answer!", (WINDOW_WIDTH // 2 - 200, WINDOW_HEIGHT // 2 ), self.pixel_font_small)
@@ -1004,7 +1078,7 @@ class SequenceSurge:
                 player_input = sequence
                 
                 self.display.blit(self.background_image, (0,0))
-                self.display.blit( self.stone_slate, (230, 110))
+                
                 
                 self.display_text(f"Current Score: {score}", (WINDOW_WIDTH // 2 - 150, WINDOW_HEIGHT // 2 -10 ))
                 pygame.display.update()
@@ -1015,7 +1089,7 @@ class SequenceSurge:
                 self.high_score = max(self.high_score, self.previous_score)
             if running:
                 self.display.blit(self.background_image, (0,0))
-                self.display.blit( self.stone_slate, (230, 110))
+                
     
                 self.display_text("Game Over!", (WINDOW_WIDTH // 2 - 100, WINDOW_HEIGHT // 2 - 50), self.pixel_font_large)
                 
