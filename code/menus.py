@@ -145,7 +145,7 @@ class Library:
 
             if self.player.hitbox_rect.colliderect(self.collide_points['maze']):
                 self.gameStateManager.set_state('Maze')
-                Maze(self.display_surface, self.gameStateManager).run()
+                MathOlympus(self.display_surface, self.gameStateManager).run()
             if self.player.hitbox_rect.colliderect(self.collide_points['locked']):
                 self.reject_access()
                 self.gameStateManager.set_state('Library')
@@ -295,6 +295,10 @@ class MathOlympus:
 
         self.live_image = pygame.image.load(join('images', 'trisha', 'lives.png'))
         self.live_image = pygame.transform.scale(self.live_image, (40, 40))
+
+        self.instructions_bg = pygame.image.load("instructions.png")
+        self.instructions_bg = pygame.transform.scale(self.instructions_bg, (WINDOW_WIDTH, WINDOW_HEIGHT))
+
 
         # Set font settings
         self.pixel_font_display = pygame.font.Font(join('fonts', 'Benguiat.ttf'), 50)
