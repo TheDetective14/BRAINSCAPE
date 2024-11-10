@@ -72,7 +72,7 @@ class Library:
         self.clock = pygame.time.Clock()
         self.all_sprites = AllSprites()
         self.collision_sprites = pygame.sprite.Group()
-        self.font = pygame.font.Font(join('fonts', 'Minecraft.ttf'), 36)
+        self.font = pygame.font.Font(join('fonts', 'Minecraft.ttf'), 32)
 
         self.collide_points = {
                 'maze': pygame.Rect(496, 880, 20, 20),
@@ -264,7 +264,464 @@ class Maze:
         pygame.quit()
 
 class JumbleMania:
-    pass
+    def __init__(self, display, gameStateManager):
+        # Display settings
+        self.SIZE = (1280, 720)
+        self.screen = display
+        self.gameStateManager = gameStateManager
+
+        # Colors
+        self.WHITE = (255, 255, 255)
+        self.DARK_RED = (139, 0, 0)
+        self.LIGHT_RED = (255, 102, 102)
+        self.VERY_DARK_BROWN = (30, 20, 10)
+
+        # Fonts
+        self.custom_font_path = join('fonts', 'Benguiat.ttf')
+        self.font = pygame.font.Font(self.custom_font_path, 20)
+        self.definition_font = pygame.font.Font(self.custom_font_path, 30)
+        self.time_font = pygame.font.Font(self.custom_font_path, 24)
+        self.score_font = pygame.font.Font(self.custom_font_path, 135)
+
+        # Load and scale images
+        self.background_intro = pygame.transform.scale(pygame.image.load(join('images', 'ace', 'Minigame menu.png')), self.SIZE)
+        self.background_image = pygame.transform.scale(pygame.image.load(join('images', 'ace', 'lava.png')), self.SIZE)
+        self.instructions_background = pygame.transform.scale(pygame.image.load(join('images', 'ace', 'Instructions Minigame.png')), self.SIZE)
+        self.play_button_image = pygame.transform.scale(pygame.image.load(join('images', 'ace', 'Play.png')), (250, 125))
+        self.tile_image = pygame.transform.scale(pygame.image.load(join('images', 'ace', 'Tile Image.png')), (100, 70))
+        self.submit_button_image = pygame.transform.scale(pygame.image.load(join('images', 'ace', 'Submit.png')), (300, 150))
+        self.correct_image = pygame.transform.scale(pygame.image.load(join('images', 'ace', 'Correct.png')), (300, 150))
+        self.incorrect_image = pygame.transform.scale(pygame.image.load(join('images', 'ace', 'Incorrect.png')), (300, 150))
+        self.score_background_image = pygame.transform.scale(pygame.image.load(join('images', 'ace', 'Score.png')), self.SIZE)
+        self.passed_background_image = pygame.transform.scale(pygame.image.load(join('images', 'ace', 'Passed.png')), self.SIZE)
+        self.failed_background_image = pygame.transform.scale(pygame.image.load(join('images', 'ace', 'Failed.png')), self.SIZE)
+        self.play_again_button_image = pygame.transform.scale(pygame.image.load(join('images', 'ace', 'Play Again.png')), (300, 150))
+    # BGM
+    def play_music_1(self):
+        """Play intro music (Music 1) and loop it."""
+        pygame.mixer.music.load(join('audio', 'BGM', 'Music 1.mp3'))
+        pygame.mixer.music.play(loops=-1)
+
+    def play_music_2(self):
+        """Play game screen music (Music 2) without looping."""
+        pygame.mixer.music.load(join('audio', 'BGM', 'Music 2.mp3'))
+        pygame.mixer.music.play(loops=-1)
+
+    def play_music_3(self):
+        """Play score screen music (Music 3) and loop it."""
+        pygame.mixer.music.load(join('audio', 'BGM', 'Music 3.2.mp3'))
+        pygame.mixer.music.play(loops=-1)
+
+    def stop_all_music(self):
+        """Stop all playing music."""
+        pygame.mixer.music.stop()
+
+    # Fade-in function
+    def fade_in(self, surface, image, duration=1.5):
+        clock = pygame.time.Clock()
+        for alpha in range(0, 255, max(1, int(255 / (duration * 60)))):
+            surface.fill((0, 0, 0))
+            image.set_alpha(alpha)
+            surface.blit(image, (0, 0))
+            pygame.display.flip()
+            clock.tick(60)
+
+    # Draw text function
+    def draw_text(self, surface, text, font, color, pos, align="center"):
+        text_surface = font.render(text, True, color)
+        text_rect = text_surface.get_rect()
+        if align == "center":
+            text_rect.center = pos
+        elif align == "left":
+            text_rect.topleft = pos
+        surface.blit(text_surface, text_rect)
+
+    def typewriter_effect(self, surface, text, font, color, pos, delay=10):
+        """Display text with a typewriter effect."""
+        text = str(text)
+        displayed_text = ""
+        
+        for char in text:
+            displayed_text += char
+            rendered_line = self.font.render(displayed_text, True, color)
+            surface.blit(rendered_line, pos)
+            pygame.display.flip()
+            pygame.time.delay(delay)  # Delay between each character
+
+    def show_instructions(self):
+        self.fade_in(self.screen, self.instructions_background, duration=1.3)
+        
+        play_button_rect = self.play_button_image.get_rect(center=(self.SIZE[0] // 2, self.SIZE[1] - 75))
+        step_size = 30
+        shift_amount = -step_size * 4
+        start_y = 260
+        left_x = self.SIZE[0] - 524 + shift_amount
+
+        instructions_part1 = [
+            "You will be shown a scramble of letters.",
+            "A definition will be provided to you.",
+            "You must drag and drop each letter to",
+            "form the correct structure of the provided",
+            "word, and press the SUBMIT button."
+        ]
+        instructions_part2 = [
+            "This will be a great challenge. You are",
+            "only provided 15 seconds to arrange the",
+            "correct word. You must get at least 3",
+            "questions correct out of 5, or else you",
+            "will be doomed to repeat this trial over",
+            "and over. Forever bound to repeat the same",
+            "fate, while the fifth and final",
+            "Stone of Truth will never",
+            "grace your presence."
+        ]
+        instructions_part3 = [    
+            "Good luck."
+        ]
+
+        # Function to display part with typewriter animation
+        def display_part(part, show_button=False):
+            self.screen.blit(self.instructions_background, (0, 0))
+            for i, line in enumerate(part):
+                self.typewriter_effect(self.screen, line, self.font, self.WHITE, (left_x, start_y + i * step_size))
+            
+            if show_button:
+                self.screen.blit(self.play_button_image, play_button_rect)
+            
+            pygame.display.flip()
+
+        # Display first part with typewriter animation
+        display_part(instructions_part1)
+        pygame.time.delay(2000)  # Wait briefly before switching screens
+
+        # Display second part with typewriter animation and Play button
+        display_part(instructions_part2)
+        pygame.time.delay(3500)
+
+        # Display second part with typewriter animation and Play button
+        display_part(instructions_part3, show_button=True)
+                    
+        # Event loop to wait for Play button click
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    return
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    if play_button_rect.collidepoint(event.pos):
+                        self.stop_all_music()  # Stop music 1 when Play button is clicked
+                        return
+            pygame.display.flip()
+
+    # Intro screen function
+    def show_start_button(self):
+        self.stop_all_music()
+        self.play_music_1()  # Start playing music 1 during the intro
+        self.fade_in(self.screen, self.background_intro)
+        start_time = time.time()
+        while time.time() - start_time < 2.5:
+            self.screen.blit(self.background_intro, (0, 0))
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    return
+            pygame.display.flip()
+        self.show_instructions()
+
+    # Word data
+    def get_word_data(self):
+        return [
+            ("glimpse", "A quick or brief look at something."),
+            ("idle", "Not active or not in use."),
+            ("keen", "Having a sharp edge or a strong interest."),
+            ("noble", "Having high moral qualities or ideals."),
+            ("omit", "To leave out or exclude."),
+            ("quest", "A search or pursuit to achieve something."),
+            ("urgent", "Requiring immediate attention."),
+            ("vague", "Not clear or specific."),
+            ("witty", "Showing quick and inventive verbal humor."),
+            ("zeal", "Great energy or enthusiasm in pursuit of a cause."),
+            ("dwell", "To live or reside in a place."),
+            ("hinge", "A joint that allows two parts to swing together."),
+            ("islet", "A small island."),
+            ("mirth", "Joyfulness or amusement."),
+            ("rift", "A crack or split in something."),
+            ("trek", "A long, arduous journey."),
+            ("adept", "Skilled or proficient at something."),
+            ("crisp", "Firm, dry, and brittle."),
+            ("dusk", "The time just before nightfall."),
+            ("grief", "Deep sorrow, especially caused by loss."),
+            ("vow", "A solemn promise."),
+            ("pique", "To stimulate interest or curiosity."),
+            ("tweak", "To make slight adjustments to something."),
+            ("align", "To place in a straight line or proper position."),
+            ("haven", "A place of safety or refuge."),
+            ("mend", "To repair something that is broken."),
+            ("utter", "To speak or say something."),
+            ("avert", "To turn away or prevent something."),
+            ("tangle", "To twist or knot together."),
+            ("quaint", "Attractively unusual or old-fashioned."),
+            ("abide", "To accept or act in accordance with something."),
+            ("mundane", "Ordinary or commonplace."),
+            ("kindle", "To ignite or inspire."),
+            ("excel", "To perform exceptionally well."),
+            ("unite", "To come together for a common purpose."),
+            ("ample", "More than enough."),
+            ("jargon", "Specialized language used by a particular group."),
+            ("lucid", "Clear and easy to understand."),
+            ("zenith", "The highest point or peak of something."),
+            ("nuance", "A subtle difference in meaning or expression."),
+            ("quirk", "A peculiar behavior or trait."),
+            ("ally", "A partner or friend in a common cause."),
+            ("gist", "The main point or essence of something."),
+            ("knack", "A special skill or talent."),
+            ("quell", "To suppress or put an end to."),
+            ("nifty", "Particularly good, clever, or stylish."),
+            ("vouch", "To assert or confirm the truth of something."),
+            ("candid", "Honest and straightforward; open."),
+            ("serene", "Calm, peaceful, and untroubled."),
+            ("justice", "The quality of being fair."),
+        ]
+
+    # Scramble word function
+    def scramble_word(self, word):
+        word_list = list(word)
+        random.shuffle(word_list)
+        return ''.join(word_list)
+
+    # Letter sprite class with dragging capability
+    class Letter(pygame.sprite.Sprite):
+        def __init__(self, screen, char, x, y):
+            super().__init__()
+            self.screen = screen
+            self.char = char
+            self.image = pygame.transform.scale(pygame.image.load(join('images', 'ace', 'Letter.png')), (90, 60))
+            self.rect = self.image.get_rect(topleft=(x, y))
+            self.font = pygame.font.Font(join('fonts', 'Benguiat.ttf'), 40)
+            self.text = self.font.render(self.char, True, (0, 0, 0))
+            self.text_rect = self.text.get_rect(center=self.rect.center)
+            self.dragging = False
+            self.snap_distance = 30  # Define a threshold distance for snapping
+
+        def draw(self):
+            self.screen.blit(self.image, self.rect)
+            self.screen.blit(self.text, self.text_rect)
+
+        def update_position(self, x, y):
+            self.rect.topleft = (x, y)
+            self.text_rect.center = self.rect.center
+
+        def start_drag(self):
+            self.dragging = True
+
+        def stop_drag(self):
+            self.dragging = False
+
+        def is_correctly_placed(self, placeholders):
+            for i, placeholder in enumerate(placeholders):
+                if self.rect.colliderect(placeholder) and placeholder.x == self.rect.x and placeholder.y == self.rect.y:
+                    return True
+            return False
+        
+        # Modified is_dragging function to consider visual proximity of ALL letters
+        def is_dragging(self, pos, all_letters):
+            closest_letter = None
+            closest_distance = float('inf')  # Initialize with infinity
+
+            for letter in all_letters:
+                # Check if the mouse click is within the letter's visual area
+                if letter.rect.collidepoint(pos) and letter.rect.centerx - letter.rect.width // 2 <= pos[0] <= letter.rect.centerx + letter.rect.width // 2 and letter.rect.centery - letter.rect.height // 2 <= pos[1] <= letter.rect.centery + letter.rect.height // 2:
+                    distance = ((letter.rect.centerx - pos[0]) ** 2 + (letter.rect.centery - pos[1]) ** 2) ** 0.5
+                    if distance < closest_distance:
+                        closest_distance = distance
+                        closest_letter = letter
+
+            if closest_letter is not None:
+                closest_letter.start_drag()  # Only the closest letter is marked as dragging
+
+        def update_drag(self):
+            if self.dragging:
+                mouse_x, mouse_y = pygame.mouse.get_pos()
+                self.update_position(mouse_x - self.rect.width // 2, mouse_y - self.rect.height // 2)
+
+        def snap_to_placeholder(self, placeholders):
+            for placeholder in placeholders:
+                distance = ((self.rect.centerx - placeholder.centerx) ** 2 +
+                            (self.rect.centery - placeholder.centery) ** 2) ** 0.5
+                if distance < self.snap_distance:
+                    self.update_position(placeholder.x, placeholder.y)
+                    break
+
+    # Check if letters are in the correct order to form the target word
+    def check_correct_order(self, letters, word, placeholders):
+        # Arrange letters by their horizontal position on the screen
+        arranged_letters = sorted(letters, key=lambda l: l.rect.x)
+        
+        # Ensure each letter is correctly placed in the right placeholder
+        for i, letter in enumerate(arranged_letters):
+            if not letter.is_correctly_placed(placeholders):
+                return False
+        
+        # Form the word from arranged letters
+        arranged_word = ''.join([letter.char for letter in arranged_letters])
+        
+        # Ensure the arranged word exactly matches the target word
+        return arranged_word == word
+
+
+    # Main game function with automatic answer checking on time out
+    # Main game function with automatic answer checking on time out
+    def play_game(self):
+        self.stop_all_music()
+        self.play_music_2()  # Play music 2 in a loop
+        word_data = self.get_word_data()
+        questions = random.sample(word_data, 5)
+        score = 0  # Reset score to 0 every time a new game starts
+
+        for word, definition in questions:  # Loop through all questions
+            scrambled = self.scramble_word(word)
+            letters = [self.Letter(self.screen, char, 0, 0) for char in scrambled]
+            running = True
+            clock = pygame.time.Clock()
+            start_time = time.time()
+            time_limit = 15
+
+            # Positioning code for letters and placeholders
+            tile_start_x = self.SIZE[0] // 2 - (100 * len(scrambled) + 10 * (len(scrambled) - 1)) // 2
+            tile_start_y = 235
+            letter_start_y = tile_start_y + 170
+
+            for i, letter in enumerate(letters):
+                letter.update_position(tile_start_x + i * (letter.rect.width + 10), letter_start_y)
+
+            placeholders = [
+                self.tile_image.get_rect(topleft=(tile_start_x + i * (self.tile_image.get_width() + 10), tile_start_y))
+                for i in range(len(scrambled))
+            ]
+
+            submit_button_rect = self.submit_button_image.get_rect(center=(self.SIZE[0] // 2, self.SIZE[1] - 115))
+            result_rect = submit_button_rect.copy()
+
+            while running:
+                self.screen.blit(self.background_image, (0, 0))
+                self.draw_text(self.screen, definition, self.definition_font, self.WHITE, (self.SIZE[0] // 2, 210), align="center")
+
+                for rect in placeholders:
+                    self.screen.blit(self.tile_image, rect)
+                for letter in letters:
+                    letter.draw()
+
+                self.screen.blit(self.submit_button_image, submit_button_rect)
+                time_elapsed = time.time() - start_time
+                time_left = max(0, time_limit - int(time_elapsed))
+                self.draw_text(self.screen, f"TIME LEFT: {time_left}", self.time_font, self.WHITE, (self.SIZE[0] // 2, submit_button_rect.top + 10), align="center")
+
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        return
+                    elif event.type == pygame.MOUSEBUTTONDOWN:
+                        for letter in letters:
+                            letter.is_dragging(event.pos, letters)  # Pass all letters to is_dragging
+                        if submit_button_rect.collidepoint(event.pos):
+                            if self.check_correct_order(letters, word, placeholders):
+                                self.screen.blit(self.correct_image, result_rect)
+                                score += 1
+                            else:
+                                self.screen.blit(self.incorrect_image, result_rect)
+                            pygame.display.flip()
+                            pygame.time.delay(1000)
+                            running = False
+                    elif event.type == pygame.MOUSEBUTTONUP:
+                        for letter in letters:
+                            if letter.dragging:
+                                letter.snap_to_placeholder(placeholders)
+                            letter.stop_drag()
+
+                for letter in letters:
+                    letter.update_drag()
+
+                if time_left <= 0:
+                    if self.check_correct_order(letters, word, placeholders):
+                        self.screen.blit(self.correct_image, result_rect)
+                        score += 1
+                    else:
+                        self.screen.blit(self.incorrect_image, result_rect)
+                    pygame.display.flip()
+                    pygame.time.delay(1000)
+                    running = False
+
+                pygame.display.flip()
+                clock.tick(60)
+
+        # Limit the score to a maximum of 5
+        score = min(score, 5)
+        self.show_score(score)
+        return score 
+
+    # Show score function with play again button
+    def show_score(self, score):
+        self.stop_all_music()
+        self.play_music_3()
+        self.screen.blit(self.score_background_image, (0, 0))
+        self.fade_in(self.screen, self.score_background_image, duration=1.5)
+        self.draw_text(self.screen, f"{score}", self.score_font, self.VERY_DARK_BROWN, (self.SIZE[0] // 2, self.SIZE[1] // 2 + 63), align="center")
+        pygame.display.flip()
+        pygame.time.delay(5000)
+
+        if score >= 3:
+            self.fade_in(self.screen, self.passed_background_image, duration=1.5)
+            pygame.time.delay(5000)
+            self.stop_all_music()
+            pygame.quit()
+            return
+        else:
+            self.fade_in(self.screen, self.failed_background_image, duration=1.5)
+            play_again_button_rect = self.play_again_button_image.get_rect(center=(self.SIZE[0] // 2, self.SIZE[1] - 75))
+            self.screen.blit(self.play_again_button_image, play_again_button_rect)
+            pygame.display.flip()
+
+            while True:
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        return
+                    elif event.type == pygame.MOUSEBUTTONDOWN:
+                        if play_again_button_rect.collidepoint(event.pos):
+                            self.stop_all_music()
+                            self.show_start_button()
+                            self.play_game()
+                            return
+                pygame.display.flip()
+
+    def run(self):
+        # Start the game
+        # Main loop to control game states
+        # Main loop to control game states
+        running = True
+        game_state = "intro"
+        score = 0  # Initialize score variable
+
+        while running:
+            if game_state == "intro":
+                self.show_start_button()  # Intro screen and instructions
+                game_state = "playing"  # Set state to playing after intro
+
+            elif game_state == "playing":
+                score = self.play_game()  # Capture the score returned from play_game
+                game_state = "score"  # Go to score screen after playing
+
+            elif game_state == "score":
+                self.show_score(score)  # Show score and handle play-again option
+                if score >= 3:
+                    running = False  # End game if passed
+                else:
+                    game_state = "intro"  # Restart if failed
+
+            # Event handling to check for exit events at each game stage
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
 
 class MapMaestros:
     pass

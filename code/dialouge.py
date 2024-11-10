@@ -12,13 +12,19 @@ class DialogueSystem:
         self.text_timer = 0           # Timer for typewriter effect
 
     def draw_dialogue_box(self):
-        # Draw the background for the dialogue box
-        dialogue_box_rect = pygame.Rect(50, WINDOW_HEIGHT - 150, WINDOW_WIDTH - 100, 100)
-        pygame.draw.rect(self.display_surface, self.box_color, dialogue_box_rect)
+        # Load the background image for the dialogue box (make sure the image is properly sized)
+        dialogue_box_image = pygame.image.load(join('images', 'dialogue_box.png')).convert_alpha()
+
+        # Set the position and dimensions for the dialogue box
+        dialogue_box_rect = dialogue_box_image.get_rect(topleft=(50, WINDOW_HEIGHT - 200))
+
+        # Blit the image onto the display surface
+        self.display_surface.blit(dialogue_box_image, dialogue_box_rect)
 
         # Display the current text in the dialogue box
         text_surface = self.font.render(self.current_text, True, 'white')
-        self.display_surface.blit(text_surface, (dialogue_box_rect.x + 10, dialogue_box_rect.y + 10))
+        self.display_surface.blit(text_surface, (dialogue_box_rect.x + 100, dialogue_box_rect.y + 70))
+
 
     def update_text(self):
         # Check if we're at the end of the dialogue
