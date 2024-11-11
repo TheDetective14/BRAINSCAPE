@@ -75,33 +75,33 @@ class Library:
         self.font = pygame.font.Font(join('fonts', 'Minecraft.ttf'), 32)
 
         self.collide_points = {
-                'maze': pygame.Rect(496, 935, 20, 20),
-                'locked': pygame.Rect(494, 288, 100, 100)
+                'maze': pygame.Rect(500, 930, 50, 50),
+                'locked': pygame.Rect(494, 288, 150, 150)
             }
         
         self.maze_collide_points = {
             'yellow': {
-                'rect': pygame.Rect(1460, 1539, 100, 100),
+                'rect': pygame.Rect(1391, 1489, 150, 150),
                 'active': True
             },
             'green': {
-                'rect': pygame.Rect(2648, 1842, 100, 100),
+                'rect': pygame.Rect(2569, 1823, 150, 150),
                 'active': True
             },
             'blue': {
-                'rect': pygame.Rect(2722, 908, 100, 100),
+                'rect': pygame.Rect(2650, 881, 150, 150),
                 'active': True
             },
             'orange': {
-                'rect': pygame.Rect(1700, 672, 300, 300),
+                'rect': pygame.Rect(1654, 588, 150, 150),
                 'active': True
             },
             'red': {
-                'rect': pygame.Rect(2134, 1632, 100, 100),
+                'rect': pygame.Rect(2096, 1519, 150, 150),
                 'active': True
             },
             'purple': {
-                'rect': pygame.Rect(2081, 1135, 100, 100),
+                'rect': pygame.Rect(2088, 1032, 150, 150),
                 'active': True
             }
         }
@@ -129,39 +129,39 @@ class Library:
             if obj.name == 'Player':
                 self.player = Player((obj.x, obj.y), self.display_surface, self.all_sprites, self.collision_sprites)
 
-    def reject_access(self):
-        # Render the message
-        self.message = "You are not allowed to enter this room yet. Find another way"
-        text = self.font.render(self.message, True, 'white')
-        text_rect = text.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2))  # Center the text
+    # def reject_access(self):
+    #     # Render the message
+    #     self.message = "You are not allowed to enter this room yet. Find another way"
+    #     text = self.font.render(self.message, True, 'white')
+    #     text_rect = text.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2))  # Center the text
 
-        # Screen shake duration and intensity
-        shake_duration = 500  # milliseconds
-        shake_intensity = 10  # pixels
+    #     # Screen shake duration and intensity
+    #     shake_duration = 500  # milliseconds
+    #     shake_intensity = 10  # pixels
 
-        # Main loop to display the message with shake effect at the beginning
-        start_time = pygame.time.get_ticks()  # Get the current time in milliseconds
-        while True:
-            # Check if 5 seconds have passed
-            current_time = pygame.time.get_ticks()
-            if current_time - start_time > 3000:
-                break  # Exit the loop after 5 seconds
+    #     # Main loop to display the message with shake effect at the beginning
+    #     start_time = pygame.time.get_ticks()  # Get the current time in milliseconds
+    #     while True:
+    #         # Check if 5 seconds have passed
+    #         current_time = pygame.time.get_ticks()
+    #         if current_time - start_time > 3000:
+    #             break  # Exit the loop after 5 seconds
 
-            # Screen shake effect
-            if current_time - start_time < shake_duration:
-                shake_x = random.randint(-shake_intensity, shake_intensity)
-                shake_y = random.randint(-shake_intensity, shake_intensity)
-            else:
-                shake_x, shake_y = 0, 0  # Stop shaking after the shake duration
+    #         # Screen shake effect
+    #         if current_time - start_time < shake_duration:
+    #             shake_x = random.randint(-shake_intensity, shake_intensity)
+    #             shake_y = random.randint(-shake_intensity, shake_intensity)
+    #         else:
+    #             shake_x, shake_y = 0, 0  # Stop shaking after the shake duration
 
-            # Fill the screen with red
-            self.display_surface.fill('red')
+    #         # Fill the screen with red
+    #         self.display_surface.fill('red')
 
-            # Draw the text with the shake offset
-            self.display_surface.blit(text, text_rect.move(shake_x, shake_y))
+    #         # Draw the text with the shake offset
+    #         self.display_surface.blit(text, text_rect.move(shake_x, shake_y))
 
-            # Update the display
-            pygame.display.update()
+    #         # Update the display
+    #         pygame.display.update()
 
     def transition(self):
         # Load video using OpenCV
@@ -251,10 +251,10 @@ class Library:
                 self.transition()
                 self.gameStateManager.set_state('Maze')
                 Maze(self.display_surface, self.gameStateManager, self.maze_collide_points).run()
-            if self.player.hitbox_rect.colliderect(self.collide_points['locked']):
-                self.reject_access()
-                self.gameStateManager.set_state('Library')
-                Library(self.display_surface, self.gameStateManager).run()
+            # if self.player.hitbox_rect.colliderect(self.collide_points['locked']):
+            #     self.reject_access()
+            #     self.gameStateManager.set_state('Library')
+            #     Library(self.display_surface, self.gameStateManager).run()
             
             self.all_sprites.update(dt)
             self.dialogue_system.update_text()
@@ -365,27 +365,27 @@ class JumbleMania:
 
         self.collide_points = {
             'yellow': {
-                'rect': pygame.Rect(1460, 1539, 100, 100),
+                'rect': pygame.Rect(1391, 1489, 150, 150),
                 'active': False
             },
             'green': {
-                'rect': pygame.Rect(2648, 1842, 300, 300),
+                'rect': pygame.Rect(2569, 1823, 150, 150),
                 'active': True
             },
             'blue': {
-                'rect': pygame.Rect(2722, 908, 100, 100),
+                'rect': pygame.Rect(2650, 881, 150, 150),
                 'active': False
             },
             'orange': {
-                'rect': pygame.Rect(1700, 672, 100, 100),
+                'rect': pygame.Rect(1654, 588, 150, 150),
                 'active': False
             },
             'red': {
-                'rect': pygame.Rect(2134, 1632, 100, 100),
+                'rect': pygame.Rect(2096, 1519, 150, 150),
                 'active': False
             },
             'purple': {
-                'rect': pygame.Rect(2081, 1135, 100, 100),
+                'rect': pygame.Rect(2088, 1032, 150, 150),
                 'active': False
             }
         }
@@ -1146,27 +1146,27 @@ class MapMaestros:
 
                 self.collide_points = {
                     'yellow': {
-                        'rect': pygame.Rect(1460, 1539, 100, 100),
+                        'rect': pygame.Rect(1391, 1489, 150, 150),
                         'active': True
                     },
                     'green': {
-                        'rect': pygame.Rect(2648, 1842, 100, 100),
+                        'rect': pygame.Rect(2569, 1823, 150, 150),
                         'active': True
                     },
                     'blue': {
-                        'rect': pygame.Rect(2722, 908, 100, 100),
+                        'rect': pygame.Rect(2650, 881, 150, 150),
                         'active': False
                     },
                     'orange': {
-                        'rect': pygame.Rect(1700, 672, 100, 100),
+                        'rect': pygame.Rect(1654, 588, 150, 150),
                         'active': False
                     },
                     'red': {
-                        'rect': pygame.Rect(2134, 1632, 100, 100),
+                        'rect': pygame.Rect(2096, 1519, 150, 150),
                         'active': True
                     },
                     'purple': {
-                        'rect': pygame.Rect(2081, 1135, 300, 300),
+                        'rect': pygame.Rect(2088, 1032, 150, 150),
                         'active': True
                     }
                 }
@@ -1419,27 +1419,27 @@ class MathOlympus:
 
         self.collide_points = {
             'yellow': {
-                'rect': pygame.Rect(1460, 1539, 100, 100),
+                'rect': pygame.Rect(1391, 1489, 150, 150),
                 'active': False
             },
             'green': {
-                'rect': pygame.Rect(2648, 1842, 300, 300),
+                'rect': pygame.Rect(2569, 1823, 150, 150),
                 'active': True
             },
             'blue': {
-                'rect': pygame.Rect(2722, 908, 100, 100),
+                'rect': pygame.Rect(2650, 881, 150, 150),
                 'active': False
             },
             'orange': {
-                'rect': pygame.Rect(1700, 672, 100, 100),
+                'rect': pygame.Rect(1654, 588, 150, 150),
                 'active': False
             },
             'red': {
-                'rect': pygame.Rect(2134, 1632, 300, 300),
+                'rect': pygame.Rect(2096, 1519, 150, 150),
                 'active': True
             },
             'purple': {
-                'rect': pygame.Rect(2081, 1135, 100, 100),
+                'rect': pygame.Rect(2088, 1032, 150, 150),
                 'active': False
             }
         }
@@ -1824,27 +1824,27 @@ class MathOlympus:
         else:
             self.collide_points = {
                 'yellow': {
-                    'rect': pygame.Rect(1460, 1539, 100, 100),
+                    'rect': pygame.Rect(1391, 1489, 150, 150),
                     'active': False
                 },
                 'green': {
-                    'rect': pygame.Rect(2648, 1842, 100, 100),
+                    'rect': pygame.Rect(2569, 1823, 150, 150),
                     'active': True
                 },
                 'blue': {
-                    'rect': pygame.Rect(2722, 908, 100, 100),
+                    'rect': pygame.Rect(2650, 881, 150, 150),
                     'active': False
                 },
                 'orange': {
-                    'rect': pygame.Rect(1700, 672, 100, 100),
+                    'rect': pygame.Rect(1654, 588, 150, 150),
                     'active': False
                 },
                 'red': {
-                    'rect': pygame.Rect(2134, 1632, 100, 100),
+                    'rect': pygame.Rect(2096, 1519, 150, 150),
                     'active': True
                 },
                 'purple': {
-                    'rect': pygame.Rect(2081, 1135, 100, 100),
+                    'rect': pygame.Rect(2088, 1032, 150, 150),
                     'active': False
                 }
             }
@@ -2037,27 +2037,27 @@ class SequenceSurge:
 
         self.collide_points = {
             'yellow': {
-                'rect': pygame.Rect(1460, 1539, 300, 300),
+                'rect': pygame.Rect(1391, 1489, 150, 150),
                 'active': True
             },
             'green': {
-                'rect': pygame.Rect(2648, 1842, 100, 100),
+                'rect': pygame.Rect(2569, 1823, 150, 150),
                 'active': True
             },
             'blue': {
-                'rect': pygame.Rect(2722, 908, 100, 100),
+                'rect': pygame.Rect(2650, 881, 150, 150),
                 'active': False
             },
             'orange': {
-                'rect': pygame.Rect(1700, 672, 100, 100),
+                'rect': pygame.Rect(1654, 588, 150, 150),
                 'active': False
             },
             'red': {
-                'rect': pygame.Rect(2134, 1632, 100, 100),
+                'rect': pygame.Rect(2096, 1519, 150, 150),
                 'active': True
             },
             'purple': {
-                'rect': pygame.Rect(2081, 1135, 100, 100),
+                'rect': pygame.Rect(2088, 1032, 150, 150),
                 'active': False
             }
         }
@@ -2469,27 +2469,27 @@ class MazeTrazze:
 
         self.collide_points = {
             'yellow': {
-                'rect': pygame.Rect(1460, 1539, 100, 100),
+                'rect': pygame.Rect(1391, 1489, 150, 150),
                 'active': True
             },
             'green': {
-                'rect': pygame.Rect(2648, 1842, 100, 100),
+                'rect': pygame.Rect(2569, 1823, 150, 150),
                 'active': True
             },
             'blue': {
-                'rect': pygame.Rect(2722, 908, 300, 300),
+                'rect': pygame.Rect(2650, 881, 150, 150),
                 'active': True
             },
             'orange': {
-                'rect': pygame.Rect(1700, 672, 100, 100),
+                'rect': pygame.Rect(1654, 588, 150, 150),
                 'active': False
             },
             'red': {
-                'rect': pygame.Rect(2134, 1632, 100, 100),
+                'rect': pygame.Rect(2096, 1519, 150, 150),
                 'active': True
             },
             'purple': {
-                'rect': pygame.Rect(2081, 1135, 100, 100),
+                'rect': pygame.Rect(2088, 1032, 150, 150),
                 'active': True
             }
         }
