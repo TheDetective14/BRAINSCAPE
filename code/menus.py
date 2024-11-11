@@ -75,7 +75,7 @@ class Library:
         self.font = pygame.font.Font(join('fonts', 'Minecraft.ttf'), 32)
 
         self.collide_points = {
-                'maze': pygame.Rect(496, 880, 20, 20),
+                'maze': pygame.Rect(496, 935, 20, 20),
                 'locked': pygame.Rect(494, 288, 100, 100)
             }
         
