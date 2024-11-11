@@ -17,7 +17,7 @@ class Game:
         self.all_sprites = AllSprites()
         self.collision_sprites = pygame.sprite.Group()
         self.collide_points = pygame.sprite.Group()
-        self.gameStateManager = GameStateManager('Library')
+        self.gameStateManager = GameStateManager('MainMenu')
 
         self.states = {
             'MainMenu': MainMenu(self.display_surface, self.gameStateManager),
@@ -25,8 +25,6 @@ class Game:
         }
 
         self.video = cv2.VideoCapture(join('images', 'intro.mp4'))
-        # self.music = pygame.mixer.Sound(join('audio', 'BGM', 'Background Music.mp3'))
-        # self.music.play(loops = -1)
 
     def run(self):
         while self.running:

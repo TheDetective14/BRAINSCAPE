@@ -87,11 +87,11 @@ class Library:
         ]
         self.dialogue_system = DialogueSystem(self.dialogue_lines, self.display_surface, self.font)
 
-        # self.music = pygame.mixer.Sound(join('audio', 'BGM', 'Background Music.mp3'))
-        # self.music.play(loops = -1)
         self.setup()
 
     def setup(self):
+        self.music = pygame.mixer.Sound(join('audio', 'BGM', 'Background Music.mp3'))
+        self.music.play(loops = -1)
         map = load_pygame(join('data', 'maps', 'library.tmx'))
 
         for x, y, image in map.get_layer_by_name('Ground').tiles():
@@ -233,7 +233,7 @@ class Maze:
             if green_point['active'] and self.player.hitbox_rect.colliderect(green_point['rect']):
                 self.gameStateManager.set_state('green')
                 green_point['active'] = False
-                FinalGame(self.display_surface, self.gameStateManager).run()
+                CreditsScene(self.display_surface, self.gameStateManager).run()
             if blue_point['active'] and self.player.hitbox_rect.colliderect(blue_point['rect']):
                 self.gameStateManager.set_state('blue')
                 blue_point['active'] = False
@@ -256,7 +256,7 @@ class Maze:
                 print(self.player.hitbox_rect.x, self.player.hitbox_rect.y)
 
             self.all_sprites.update(dt)
-            self.display_surface.fill('black')            
+            self.display_surface.fill('black')
             self.all_sprites.draw(self.player.rect.center)
             
             pygame.display.update()
@@ -732,9 +732,9 @@ class MapMaestros:
                 self.gameStateManager = gameStateManager
 
                 # Screen dimensions
-                self.screen_width = 1280
-                self.screen_height = 720
-                self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
+                WINDOW_WIDTH = 1280
+                WINDOW_HEIGHT = 720
+                self.screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
                 pygame.display.set_caption("Starry Background")
 
                 # Load videos
@@ -745,7 +745,7 @@ class MapMaestros:
                 ret, frame = self.video_clip.read()
                 self.first_frame = frame
                 self.video_width, self.video_height = self.first_frame.shape[:2]
-                self.screen_aspect_ratio = self.screen_width / self.screen_height
+                self.screen_aspect_ratio = WINDOW_WIDTH / WINDOW_HEIGHT
                 self.video_aspect_ratio = self.video_width / self.video_height
                 self.zoom_factor = 1.0
                 self.current_frame = 0
@@ -758,8 +758,8 @@ class MapMaestros:
                 self.exit_button_image = pygame.transform.scale(self.exit_button_image, (self.exit_button_image.get_width() // 3, self.exit_button_image.get_height() // 3))
 
                 # Set button positions
-                self.start_button_rect = self.start_button_image.get_rect(center=(self.screen_width // 2 - 15, self.screen_height // 2 + 150))
-                self.exit_button_rect = self.exit_button_image.get_rect(center=(self.screen_width // 2 - 15, self.screen_height // 2 + 250))
+                self.start_button_rect = self.start_button_image.get_rect(center=(WINDOW_WIDTH // 2 - 15, WINDOW_HEIGHT // 2 + 150))
+                self.exit_button_rect = self.exit_button_image.get_rect(center=(WINDOW_WIDTH // 2 - 15, WINDOW_HEIGHT // 2 + 250))
 
                 # Load and play background music
                 pygame.mixer.music.load(join('audio', 'BGM', 'main_menusound.mp3'))
@@ -793,8 +793,8 @@ class MapMaestros:
                         )
                         video_surface = pygame.transform.flip(video_surface, True, False)
                         video_surface = pygame.transform.rotate(video_surface, 90)
-                        x_offset = (self.screen_width - video_surface.get_width()) // 2
-                        y_offset = (self.screen_height - video_surface.get_height()) // 2
+                        x_offset = (WINDOW_WIDTH - video_surface.get_width()) // 2
+                        y_offset = (WINDOW_HEIGHT - video_surface.get_height()) // 2
 
                     # Draw background
                     self.screen.blit(video_surface, (x_offset, y_offset))
@@ -816,9 +816,9 @@ class MapMaestros:
                 self.gameStateManager = gameStateManager
 
                 # Screen dimensions
-                self.screen_width = 1280
-                self.screen_height = 720
-                self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
+                WINDOW_WIDTH = 1280
+                WINDOW_HEIGHT = 720
+                self.screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
                 pygame.display.set_caption("Map Maestros - Instructions")
 
                 # Load images
@@ -829,7 +829,7 @@ class MapMaestros:
                 self.next_button_image = pygame.transform.scale(self.next_button_image, (300, 200))
 
                 # Set button position
-                self.next_button_rect = self.next_button_image.get_rect(bottomright=(self.screen_width - 20, self.screen_height - 20))
+                self.next_button_rect = self.next_button_image.get_rect(bottomright=(WINDOW_WIDTH - 20, WINDOW_HEIGHT - 20))
 
                 # Load and convert images to PNG format
                 self.blue_box_image = pygame.image.load(join('images', 'josh', "map_text2.png")).convert_alpha()
@@ -838,8 +838,8 @@ class MapMaestros:
                 self.red_box_image = pygame.transform.scale(self.red_box_image, (600,300))
 
                 # Set box positions (center on the screen)
-                self.blue_box_rect = self.blue_box_image.get_rect(center=(self.screen_width // 2, self.screen_height // 2 + 50))
-                self.red_box_rect = self.red_box_image.get_rect(center=(self.screen_width // 2, self.screen_height // 2 + 40))
+                self.blue_box_rect = self.blue_box_image.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2 + 50))
+                self.red_box_rect = self.red_box_image.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2 + 40))
 
                 # Set box visibility
                 self.show_blue_box = True
@@ -908,9 +908,9 @@ class MapMaestros:
                 self.gameStateManager = gameStateManager
 
                 # Screen dimensions
-                self.screen_width = 1280
-                self.screen_height = 720
-                self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
+                WINDOW_WIDTH = 1280
+                WINDOW_HEIGHT = 720
+                self.screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
                 pygame.display.set_caption("Countdown")
 
                 # Load countdown image
@@ -970,7 +970,7 @@ class MapMaestros:
                 self.screen = pygame.display.set_mode((1280, 720))
                 pygame.display.set_caption("Countdown")
 
-                self.screen_width, self.screen_height = self.screen.get_size()
+                WINDOW_WIDTH, WINDOW_HEIGHT = self.screen.get_size()
                 self.background_image = pygame.image.load(join('images', 'josh', 'actual_laro.png')).convert_alpha()
                 self.background_image = pygame.transform.scale(self.background_image, (1280, 720))
 
@@ -989,7 +989,7 @@ class MapMaestros:
                 countdown_images = [self.number_three, self.number_two, self.number_one]
                 for img in countdown_images:
                     self.screen.blit(self.background_image, (0, 0))  # Blit background
-                    img_rect = img.get_rect(center=(self.screen_width // 2, self.screen_height // 2 + 50))  # Adjust position lower
+                    img_rect = img.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2 + 50))  # Adjust position lower
                     self.screen.blit(img, img_rect)  # Blit countdown image
                     pygame.display.flip()
                     pygame.time.wait(1000)  # Wait for 1 second
@@ -1010,12 +1010,12 @@ class MapMaestros:
                 self.gameStateManager = gameStateManager
                 pygame.display.set_caption("Continent Match")
 
-                self.screen_width, self.screen_height = self.screen.get_size()
+                WINDOW_WIDTH, WINDOW_HEIGHT = self.screen.get_size()
                 self.background_image = pygame.image.load(join('images', 'josh', 'actual_game.png')).convert_alpha()
                 self.background_image = pygame.transform.scale(self.background_image, (1280, 720))
 
                 self.box_image = pygame.image.load(join('images', 'josh', 'the_box.png')).convert_alpha()
-                self.box_image = pygame.transform.scale(self.box_image, (self.screen_width, self.screen_height))
+                self.box_image = pygame.transform.scale(self.box_image, (WINDOW_WIDTH, WINDOW_HEIGHT))
                 
                 self.box_width, self.box_height = 180, 160
                 self.ice_cube_image = pygame.image.load(join('images', 'josh', 'ice_cube.png')).convert_alpha()
@@ -1066,7 +1066,7 @@ class MapMaestros:
                 self.exit_button_image = pygame.image.load(join('images', 'josh', 'exit_button.png')).convert_alpha()
                 self.exit_button_image = pygame.transform.scale(self.exit_button_image, (200, 90))
                 self.you_won_image = pygame.image.load(join('images', 'josh', 'you_won.png')).convert_alpha()
-                self.you_won_image = pygame.transform.scale(self.you_won_image, (self.screen_width // 2, self.screen_height // 2))
+                self.you_won_image = pygame.transform.scale(self.you_won_image, (WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2))
 
             def reset_game(self):
                 random.shuffle(self.countries)
@@ -1078,9 +1078,9 @@ class MapMaestros:
                 self.running = True
                 self.show_try_again = False
 
-                top_row_start_x = (self.screen_width - (4 * 150 + 3 * self.gap_x)) // 2
-                bottom_row_start_x = (self.screen_width - (3 * 150 + 2 * self.gap_x)) // 2
-                top_row_y = (self.screen_height - 2 * 140 - self.gap_y) // 2
+                top_row_start_x = (WINDOW_WIDTH - (4 * 150 + 3 * self.gap_x)) // 2
+                bottom_row_start_x = (WINDOW_WIDTH - (3 * 150 + 2 * self.gap_x)) // 2
+                top_row_y = (WINDOW_HEIGHT - 2 * 140 - self.gap_y) // 2
                 bottom_row_y = top_row_y + 140 + self.gap_y
                 
                 self.continents = {
@@ -1093,11 +1093,11 @@ class MapMaestros:
                     "Antarctica": pygame.Rect(bottom_row_start_x + 2 * (150 + self.gap_x), bottom_row_y, 150, 140)
                 }
 
-                self.country_rect = pygame.Rect((self.screen_width - self.box_width) // 2, bottom_row_y + 140 + self.gap_y, self.box_width, self.box_height)
+                self.country_rect = pygame.Rect((WINDOW_WIDTH - self.box_width) // 2, bottom_row_y + 140 + self.gap_y, self.box_width, self.box_height)
                 self.country_rect_original_pos = self.country_rect.topleft
                 # Assuming 1cm = 37.7953 pixels (approximately)
-                self.try_again_button = pygame.Rect((self.screen_width // 2 - int(10 * 37.7953) // 2), self.screen_height // 2 - int(10 * 37.7953) // 2, int(10 * 37.7953), int(10 * 37.7953))  
-                self.exit_button = pygame.Rect((self.screen_width - 200) // 2, self.screen_height // 2 + 120, 200, 50) # Moved exit button down
+                self.try_again_button = pygame.Rect((WINDOW_WIDTH // 2 - int(10 * 37.7953) // 2), WINDOW_HEIGHT // 2 - int(10 * 37.7953) // 2, int(10 * 37.7953), int(10 * 37.7953))  
+                self.exit_button = pygame.Rect((WINDOW_WIDTH - 200) // 2, WINDOW_HEIGHT // 2 + 120, 200, 50) # Moved exit button down
 
                 self.timer_x = self.country_rect.x - 200
                 self.score_x = self.country_rect.x + self.country_rect.width + 50
@@ -1193,7 +1193,7 @@ class MapMaestros:
 
             def display_text(self, message, font, color=(255, 0, 0)):
                 text_surface = font.render(message, True, color)
-                text_rect = text_surface.get_rect(center=(self.screen_width // 2, self.screen_height // 2))
+                text_rect = text_surface.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2))
                 self.screen.blit(text_surface, text_rect)
                 pygame.display.flip()
 
@@ -1202,7 +1202,7 @@ class MapMaestros:
 
             def display_win_screen(self):
                 # Display "YOU WON!" message
-                self.screen.blit(self.you_won_image, (self.screen_width // 2 - self.you_won_image.get_width() // 2, self.screen_height // 2 - self.you_won_image.get_height() // 2)) 
+                self.screen.blit(self.you_won_image, (WINDOW_WIDTH // 2 - self.you_won_image.get_width() // 2, WINDOW_HEIGHT // 2 - self.you_won_image.get_height() // 2)) 
                 # Draw button
                 self.screen.blit(self.exit_button_image, self.exit_button.topleft)
                 pygame.display.flip()
@@ -2172,72 +2172,60 @@ class SequenceSurge:
 
 class MazeTrazze:
     def __init__(self, display, gameStateManager):
-        self.display_surface = display
+        # Set up background music
+        pygame.mixer.music.load(join('audio', 'BGM', 'final_level_Bg.mp3'))  # Load the background music file
+        pygame.mixer.music.set_volume(0.5)  # Set the volume (range from 0.0 to 1.0)
+        pygame.mixer.music.play(-1)  # Play the music in a loop (-1 means infinite loop)
+
+        self.screen = display
         self.gameStateManager = gameStateManager
+
+        # Load background images
+        self.menu_background_image = pygame.image.load(join('images', 'dale', "1.png")).convert()  # Menu background
+        self.menu_background_image = pygame.transform.scale(self.menu_background_image, (WINDOW_WIDTH, WINDOW_HEIGHT))
+
+        self.question_background_image = pygame.image.load(join('images', 'dale', "4.png")).convert()  # Question background
+        self.question_background_image = pygame.transform.scale(self.question_background_image, (WINDOW_WIDTH, WINDOW_HEIGHT))
+
+        self.question_box_image = pygame.image.load(join('images', 'dale', "2.png")).convert_alpha()  # Question box
+        self.question_box_image = pygame.transform.scale(self.question_box_image, (800, 200))
+
+        # Load the background for each answer choice box
+        self.choice_box_image = pygame.image.load(join('images', 'dale', "3.png")).convert_alpha()  # Choice box image
+        self.choice_box_image = pygame.transform.scale(self.choice_box_image, (600, 80))  # Scale to fit the buttons
+
+        # Load the background for the start button
+        self.start_button_image = pygame.image.load(join('images', 'dale', "5.png")).convert_alpha()  # Start button image
+        self.start_button_image = pygame.transform.scale(self.start_button_image, (400, 80))  # Scale to fit the button
+
+        # Load the "Correct.png" and "Wrong.png" images for the result boxes
+        self.correct_box_image = pygame.image.load(join('images', 'dale', "Correct.png")).convert_alpha()  # Correct result box
+        self.correct_box_image = pygame.transform.scale(self.correct_box_image, (600, 100))  # Scale to fit the message box
+        
+        self.wrong_box_image = pygame.image.load(join('images', 'dale', "Wrong.png")).convert_alpha()  # Wrong result box
+        self.wrong_box_image = pygame.transform.scale(self.wrong_box_image, (600, 100))  # Scale to fit the message box
+
+        # Load the "Restart.png" image for the restart button
+        self.restart_button_image = pygame.image.load(join('images', 'dale', "Restart.png")).convert_alpha()  # Restart button image
+        self.restart_button_image = pygame.transform.scale(self.restart_button_image, (300, 80))  # Scale to fit the button
 
         # Colors
         self.WHITE = (255, 255, 255)
         self.BLACK = (0, 0, 0)
         self.BLUE = (70, 130, 180)
         self.GREEN = (0, 255, 0)
+        self.ORANGE = (255, 165, 0)  # Orange color
         self.RED = (255, 69, 0)
         self.YELLOW = (255, 215, 0)
-        
-        # Load and scale background image
-        try:
-            self.background = pygame.image.load(join('images', 'background.png'))
-            self.background = pygame.transform.scale(self.background, (WINDOW_WIDTH, WINDOW_HEIGHT))
-        except pygame.error:
-            print("Error loading background image. Please check the file path.")
-            sys.exit()
-        
-        # Load pixel font with fallback
-        pixel_font_path = join('fonts', 'Minecraft.ttf')  # Replace with the actual path to your pixel font
-        try:
-            self.font = pygame.font.Font(pixel_font_path, 30)
-            self.large_font = pygame.font.Font(pixel_font_path, 50)
-        except FileNotFoundError:
-            self.font = pygame.font.SysFont("Arial", 30)
-            self.large_font = pygame.font.SysFont("Arial", 50)
 
-        # Question and answer pairs
-        self.qa_pairs = [
-            ("Closest to the Sun", "Mercury", ["Venus", "Earth", "Mars"]),
-            ("Plant food process", "Photosynthesis", ["Respiration", "Digestion", "Fermentation"]),
-            ("Water symbol", "H2O", ["O2", "CO2", "H2"]),
-            ("Fastest land animal", "Cheetah", ["Lion", "Tiger", "Elephant"]),
-            ("Hottest planet", "Venus", ["Mercury", "Earth", "Mars"]),
-            ("Largest planet", "Jupiter", ["Saturn", "Uranus", "Neptune"]),
-            ("Light is faster than", "Sound", ["Heat", "Gravity", "Water"]),
-            ("Keeps us grounded", "Gravity", ["Magnetism", "Friction", "Inertia"]),
-            ("Atom center", "Nucleus", ["Electron", "Proton", "Neutron"]),
-            ("Cell powerhouse", "Mitochondria", ["Nucleus", "Ribosome", "Chloroplast"]),
-            ("Electric current unit", "Ampere", ["Volt", "Watt", "Ohm"]),
-            ("Weather study", "Meteorology", ["Geology", "Astronomy", "Biology"]),
-            ("Water freeze point", "0°C", ["32°F", "100°C", "-273°C"]),
-            ("Most air gas", "Nitrogen", ["Oxygen", "Carbon Dioxide", "Argon"]),
-            ("Sun energy source", "Solar", ["Wind", "Nuclear", "Hydro"]),
-            ("Closest star", "Sun", ["Proxima Centauri", "Sirius", "Alpha Centauri"]),
-            ("We breathe this gas", "Oxygen", ["Carbon Dioxide", "Nitrogen", "Hydrogen"]),
-            ("Liquid metal", "Mercury", ["Gallium", "Iron", "Lead"]),
-            ("Symbol for 'Fe'", "Iron", ["Gold", "Silver", "Copper"]),
-            ("Hardest natural thing", "Diamond", ["Gold", "Iron", "Silver"]),
-            ("Red planet", "Mars", ["Jupiter", "Venus", "Mercury"]),
-            ("First periodic element", "Hydrogen", ["Helium", "Lithium", "Carbon"]),
-            ("Pumps blood", "Heart", ["Lungs", "Liver", "Kidneys"]),
-            ("Largest body organ", "Skin", ["Liver", "Heart", "Brain"]),
-            ("Smallest element particle", "Atom", ["Molecule", "Compound", "Cell"]),
-            ("Plant gas", "Oxygen", ["Nitrogen", "Carbon Dioxide", "Hydrogen"]),
-            ("Planet with rings", "Saturn", ["Jupiter", "Uranus", "Neptune"]),
-            ("Regrows limbs", "Starfish", ["Lizard", "Octopus", "Snake"]),
-            ("Measures temperature", "Thermometer", ["Barometer", "Stethoscope", "Chronometer"]),
-            ("Rock study", "Geology", ["Biology", "Physics", "Chemistry"])
-        ]
-        
+        # Font settings
+        self.font = pygame.font.Font(join('fonts', 'Benguiat.ttf'), 30)
+        self.large_font = pygame.font.Font(join('fonts', 'Benguiat.ttf'), 50)
+
         # Game variables
         self.level = 1
         self.max_level = 3
-        self.questions_per_level = 5
+        self.questions_per_level = 3
         self.current_questions = []
         self.current_question_index = 0
         self.correct_answer = None
@@ -2245,115 +2233,209 @@ class MazeTrazze:
         self.question = ""
         self.correct_answers = 0
         self.score = 0
-        self.state = "menu"
+        self.state = "menu"  # Default to menu state
         self.result_text = ""
         self.used_questions = set()
 
+        # Passing score threshold
+        self.passing_score = 30
+
+        # Question and answer pairs
+        self.qa_pairs = [
+            ("Which planet is known as the 'Morning Star' or the 'Evening Star'?", "Venus", ["Mercury", "Mars", "Jupiter"]),
+            ("What gas do plants absorb from the atmosphere for photosynthesis?", "Carbon Dioxide", ["Oxygen", "Nitrogen", "Hydrogen"]),
+            ("What is the most abundant gas in Earth's atmosphere?", "Nitrogen", ["Oxygen", "Carbon Dioxide", "Hydrogen"]),
+            ("What is the chemical symbol for water?", "H₂O", ["CO₂", "O₂", "H₂"]),
+            ("Who is known as the father of modern physics?", "Albert Einstein", ["Isaac Newton", "Galileo Galilei", "Nikola Tesla"]),
+            ("What is the smallest unit of life that can replicate independently?", "Cell", ["Atom", "Molecule", "Organ"]),
+            ("What type of animal is a dolphin?", "Mammal", ["Fish", "Amphibian", "Reptile"]),
+            ("What is the main element found in the Sun?", "Hydrogen", ["Helium", "Oxygen", "Carbon"]),
+            ("What is the powerhouse of the cell?", "Mitochondria", ["Nucleus", "Ribosome", "Endoplasmic Reticulum"]),
+            ("What force keeps us anchored to the Earth?", "Gravity", ["Magnetism", "Friction", "Electromagnetic Force"])
+        ]
+
     def get_random_questions(self, num):
-        available_questions = [q for q in self.qa_pairs if q not in self.used_questions]
+        """Get unique questions for a level and avoid running out of questions."""
+        available_questions = [
+            (q[0], q[1], q[2])  # Tuple of question, correct answer, and wrong choices
+            for q in self.qa_pairs if (q[0], q[1]) not in self.used_questions
+        ]
+        if len(available_questions) < num:
+            num = len(available_questions)  # Limit to available questions
         selected_questions = random.sample(available_questions, num)
-        self.used_questions.update(selected_questions)
+        self.used_questions.update((q[0], q[1]) for q in selected_questions)  # Store only question and answer tuple
         return selected_questions
 
     def set_question(self):
-        self.question, self.correct_answer, wrong_choices = self.current_questions[self.current_question_index]
-        self.choices = wrong_choices + [self.correct_answer]
-        random.shuffle(self.choices)
+        """Set the current question and choices"""
+        if self.current_questions:
+            self.question, self.correct_answer, wrong_choices = self.current_questions[self.current_question_index]
+            self.choices = wrong_choices + [self.correct_answer]
+            random.shuffle(self.choices)
 
     def draw_menu(self):
-        self.display_surface.blit(self.background, (0, 0))
-        title_text = self.large_font.render(f"Science Quiz Game - Level {self.level}", True, self.WHITE)
-        self.display_surface.blit(title_text, (WINDOW_WIDTH // 2 - title_text.get_width() // 2, 100))
-        instruction_text = self.font.render("Answer all questions correctly to move to the next level!", True, self.YELLOW)
-        self.display_surface.blit(instruction_text, (WINDOW_WIDTH // 2 - instruction_text.get_width() // 2, 200))
-        start_button = pygame.Rect(WINDOW_WIDTH // 2 - 150, WINDOW_HEIGHT // 2, 300, 80)
-        pygame.draw.rect(self.display_surface, self.GREEN, start_button)
-        start_text = self.font.render("Start Game", True, self.BLACK)
-        self.display_surface.blit(start_text, (start_button.x + 60, start_button.y + 25))
-        return start_button
+        """Draw the menu screen"""
+        self.screen.blit(self.menu_background_image, (0, 0))  # Draw menu background
+
+        # Draw the start button with "5.png" as background
+        start_button_rect = pygame.Rect(WINDOW_WIDTH // 2 - 200, WINDOW_HEIGHT // 2, 400, 80)
+        self.screen.blit(self.start_button_image, start_button_rect.topleft)
+
+        # Draw the "Start Game" text in orange color on top of the image
+        start_text = self.font.render("Start Game", True, self.ORANGE)
+        start_text_rect = start_text.get_rect(center=start_button_rect.center)
+        self.screen.blit(start_text, start_text_rect)
+
+        return start_button_rect
 
     def draw_question(self):
-        self.display_surface.blit(self.background, (0, 0))
+        """Draw the question and choices"""
+        self.screen.blit(self.question_background_image, (0, 0))  # Draw question background
+
+        # Score display
         score_text = self.font.render(f"Score: {self.score}", True, self.YELLOW)
-        self.display_surface.blit(score_text, (20, 20))
+        self.screen.blit(score_text, (20, 20))
+
+        # Draw the question box and center the question text inside it
+        question_box_rect = self.question_box_image.get_rect(center=(WINDOW_WIDTH // 2, 150))
+        self.screen.blit(self.question_box_image, question_box_rect)
+
         question_text = self.font.render(self.question, True, self.BLACK)
-        self.display_surface.blit(question_text, (WINDOW_WIDTH // 2 - question_text.get_width() // 2, 100))
+        question_text_rect = question_text.get_rect(center=question_box_rect.center)
+        self.screen.blit(question_text, question_text_rect)
+
+        # Draw answer choice buttons
         answer_buttons = []
         for i, choice in enumerate(self.choices):
-            button = pygame.Rect(200, 200 + i * 100, 600, 80)
-            pygame.draw.rect(self.display_surface, self.BLUE, button)
+            button = pygame.Rect(WINDOW_WIDTH // 2 - 300, 300 + i * 100, 600, 80)
+
+            # Draw the "3.png" image as the background for each answer choice box
+            self.screen.blit(self.choice_box_image, button.topleft)
+            
             choice_text = self.font.render(choice, True, self.WHITE)
-            self.display_surface.blit(choice_text, (button.x + 20, button.y + 20))
+            choice_text_rect = choice_text.get_rect(center=button.center)
+            self.screen.blit(choice_text, choice_text_rect)
+
             answer_buttons.append((button, choice))
+
         return answer_buttons
 
     def draw_result(self):
-        self.display_surface.blit(self.background, (0, 0))
-        result_message = self.large_font.render(self.result_text, True, self.GREEN if self.result_text == "Correct!" else self.RED)
-        self.display_surface.blit(result_message, (WINDOW_WIDTH // 2 - result_message.get_width() // 2, WINDOW_HEIGHT // 2 - 50))
-        next_button = pygame.Rect(WINDOW_WIDTH // 2 - 150, WINDOW_HEIGHT // 2 + 50, 300, 80)
-        pygame.draw.rect(self.display_surface, self.GREEN, next_button)
-        next_text = self.font.render("Next", True, self.BLACK)
-        self.display_surface.blit(next_text, (next_button.x + 100, next_button.y + 25))
-        return next_button
+        """Draw the result screen with 'Correct!' or 'Wrong!'"""
+        self.screen.blit(self.question_background_image, (0, 0))  # Draw background
+
+        result_box_rect = pygame.Rect(WINDOW_WIDTH // 2 - 300, WINDOW_HEIGHT // 2 - 50, 600, 100)
+        if self.result_text == "Correct!":
+            self.screen.blit(self.correct_box_image, result_box_rect.topleft)
+        else:
+            self.screen.blit(self.wrong_box_image, result_box_rect.topleft)
+
+        result_message = self.large_font.render(self.result_text, True, self.YELLOW)
+        result_message_rect = result_message.get_rect(center=result_box_rect.center)
+        self.screen.blit(result_message, result_message_rect)
+
+        pygame.display.update()
+        pygame.time.wait(1000)  # Short pause before next question
 
     def draw_game_over(self):
-        self.display_surface.blit(self.background, (0, 0))
-        game_over_text = self.large_font.render("Congratulations! You've completed the game!", True, self.YELLOW)
-        final_score_text = self.font.render(f"Final Score: {self.score}", True, self.YELLOW)
-        self.display_surface.blit(game_over_text, (WINDOW_WIDTH // 2 - game_over_text.get_width() // 2, 200))
-        self.display_surface.blit(final_score_text, (WINDOW_WIDTH // 2 - final_score_text.get_width() // 2, 300))
+        """Draw the game over screen"""
+        self.screen.blit(self.menu_background_image, (0, 0))  # Draw menu background
+
+        # Final score message
+        final_score_text = self.large_font.render(f"Final Score: {self.score}", True, self.YELLOW)
+        final_score_rect = final_score_text.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2 - 100))
+        self.screen.blit(final_score_text, final_score_rect)
+
+        # Check if the player passed or failed
+        if self.score >= self.passing_score:
+            result_text = self.large_font.render("You Passed! Exiting...", True, self.GREEN)
+        else:
+            result_text = self.large_font.render("You Failed! Restarting...", True, self.RED)
+        
+        result_rect = result_text.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2))
+        self.screen.blit(result_text, result_rect)
+
+        # Draw the restart button with "Restart.png" as background
+        restart_button_rect = pygame.Rect(WINDOW_WIDTH // 2 - 150, WINDOW_HEIGHT // 2 + 100, 300, 80)
+        self.screen.blit(self.restart_button_image, restart_button_rect.topleft)
+
+        # Restart game text on top of the button
+        restart_text = self.font.render("Restart Game", True, self.ORANGE)
+        restart_text_rect = restart_text.get_rect(center=restart_button_rect.center)
+        self.screen.blit(restart_text, restart_text_rect)
+
+        return restart_button_rect
 
     def run(self):
-        running = True
-        while running:
-            self.display_surface.fill(self.WHITE)
-            if self.state == "menu":
-                start_button = self.draw_menu()
-            elif self.state == "playing":
-                answer_buttons = self.draw_question()
-            elif self.state == "result":
-                next_button = self.draw_result()
-            elif self.state == "game_over":
-                self.draw_game_over()
+        """Main game loop"""
+        clock = pygame.time.Clock()
 
+        while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    pos = pygame.mouse.get_pos()
-                    if self.state == "menu" and start_button.collidepoint(pos):
-                        self.current_questions = self.get_random_questions(self.questions_per_level)
-                        self.current_question_index = 0
-                        self.correct_answers = 0
-                        self.set_question()
-                        self.state = "playing"
-                    elif self.state == "playing":
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    mouse_pos = pygame.mouse.get_pos()
+
+                    if self.state == "menu":
+                        start_button_rect = self.draw_menu()
+                        if start_button_rect.collidepoint(mouse_pos):
+                            self.state = "question"
+                            self.current_questions = self.get_random_questions(self.questions_per_level)
+                            self.current_question_index = 0
+                            self.set_question()
+                    elif self.state == "question":
+                        answer_buttons = self.draw_question()
                         for button, choice in answer_buttons:
-                            if button.collidepoint(pos):
+                            if button.collidepoint(mouse_pos):
                                 if choice == self.correct_answer:
                                     self.result_text = "Correct!"
-                                    self.correct_answers += 1
                                     self.score += 10
+                                    self.correct_answers += 1
                                 else:
                                     self.result_text = "Wrong!"
                                 self.state = "result"
-                    elif self.state == "result" and next_button.collidepoint(pos):
+                    elif self.state == "result":
                         self.current_question_index += 1
-                        if self.current_question_index >= self.questions_per_level:
-                            if self.correct_answers == self.questions_per_level:
-                                if self.level < self.max_level:
-                                    self.level += 1
-                                    self.state = "menu"
-                                else:
-                                    self.state = "game_over"
-                            else:
-                                self.state = "menu"
-                        else:
+                        if self.current_question_index < len(self.current_questions):
                             self.set_question()
-                            self.state = "playing"
+                            self.state = "question"
+                        else:
+                            self.level += 1
+                            if self.level > self.max_level:
+                                self.state = "game_over"
+                            else:
+                                self.current_questions = self.get_random_questions(self.questions_per_level)
+                                self.current_question_index = 0
+                                self.set_question()
+                                self.state = "question"
+                    elif self.state == "game_over":
+                        restart_button_rect = self.draw_game_over()
+                        if restart_button_rect.collidepoint(mouse_pos):
+                            if self.score >= self.passing_score:
+                                Maze(self.screen, self.gameStateManager).run()
+                            else:
+                                self.level = 1
+                                self.score = 0
+                                self.used_questions.clear()
+                                self.current_questions = self.get_random_questions(self.questions_per_level)
+                                self.current_question_index = 0
+                                self.set_question()
+                                self.state = "question"
+
+            # Draw the current screen based on the state
+            if self.state == "menu":
+                self.draw_menu()
+            elif self.state == "question":
+                self.draw_question()
+            elif self.state == "result":
+                self.draw_result()
+            elif self.state == "game_over":
+                self.draw_game_over()
+
             pygame.display.flip()
+            clock.tick(60)
 
 class FinalGame:
     def __init__(self, display, gameStateManager):
@@ -2376,6 +2458,9 @@ class CreditsScene:
 
         # Credits text
         self.credits_text = [
+            "Congratulations! You have escaped and beaten BRAINSCAPE!!!",
+            "Please approach any member of LT3 to claim your prize.",
+            "",
             "CREDITS",
             "",
             "Intro Video: Angela Chrysler Tana",
@@ -2409,14 +2494,6 @@ class CreditsScene:
             "Graphics: Joshua Licarte & Ace Tana",
             "Presentation Video: Joshua Licarte & Ace Tana",
             "Infographic Poster: Trisha Espiritu",
-            "",
-            "AWARDS",
-            "Non-ChatGPT User: Dan Gochuico",
-            "Fastest Coder: Dan Gochuico",
-            "Most : Dan Gochuico",
-            "Most Logical: Dan Gochuico",
-            "Most Hours Spent Coding (~40 hours): Dan Gochuico",
-            "Most Hours Spent Waiting (~100 hours): Dan Gochuico",
             "",
             "TOOLS",
             "Fonts: www.dafont.com",
