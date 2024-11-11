@@ -107,18 +107,18 @@ class Library:
         }
         
         self.dialogue_lines = [
-            "Hello, welcome to the game!",
-            "This is an example of a dialogue system in Pygame.",
-            "You can use this to create conversations between characters.",
-            "Press SPACE to continue..."
+            "*You open your eyes* (Press space to continue)",
+            "In front of you is a normal library.",
+            "A regular library, just like any other.",
+            "You can't tell what, but something is wrong.",
+            "You don't know how you got there, or where you are...",
+            "Is that you need to explore the area, and escape."
         ]
         self.dialogue_system = DialogueSystem(self.dialogue_lines, self.display_surface, self.font)
 
         self.setup()
 
     def setup(self):
-        self.music = pygame.mixer.Sound(join('audio', 'BGM', 'Background Music.mp3'))
-        self.music.play(loops = -1)
         map = load_pygame(join('data', 'maps', 'library.tmx'))
 
         for x, y, image in map.get_layer_by_name('Ground').tiles():
@@ -1318,7 +1318,7 @@ class MathOlympus:
         self.instructions_bg = pygame.image.load(join('images', 'trisha',"instructions.png"))
         self.instructions_bg = pygame.transform.scale(self.instructions_bg, (WINDOW_WIDTH, WINDOW_HEIGHT))
 
-        pygame.mixer.music.load("bg_music.mp3")
+        pygame.mixer.music.load(join('audio', 'BGM', 'bg_music.mp3'))
         pygame.mixer.music.play(-1) 
 
         self.collide_points = {

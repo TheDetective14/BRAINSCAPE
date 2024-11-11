@@ -37,7 +37,7 @@ class DialogueSystem:
                 self.current_text += full_text[len(self.current_text)]
                 self.text_timer = 0  # Reset timer for next character
         else:
-            self.current_text = "End of dialogue."
+            self.current_text = "Find the exit."
 
         # Increment the text timer
         self.text_timer += 1
