@@ -254,8 +254,8 @@ class Library:
                 self.music.stop()
                 self.transition()
                 self.gameStateManager.set_state('Maze')
-                Outro(self.display_surface).run()
-                # Maze(self.display_surface, self.gameStateManager, self.maze_collide_points).run()
+                # JumbleMania(self.display_surface, self.gameStateManager).run()
+                Maze(self.display_surface, self.gameStateManager, self.maze_collide_points).run()
             # if self.player.hitbox_rect.colliderect(self.collide_points['locked']):
             #     self.reject_access()
             #     self.gameStateManager.set_state('Library')
@@ -321,7 +321,7 @@ class Maze:
                 self.gameStateManager.set_state('green')
                 green_point['active'] = False
                 self.music.stop()
-                CreditsScene(self.display_surface, self.gameStateManager).run()
+                Outro(self.display_surface, self.gameStateManager).run()
             if blue_point['active'] and self.player.hitbox_rect.colliderect(blue_point['rect']):
                 self.gameStateManager.set_state('blue')
                 blue_point['active'] = False
@@ -415,25 +415,29 @@ class JumbleMania:
         self.passed_background_image = pygame.transform.scale(pygame.image.load(join('images', 'ace', 'Passed.png')), self.SIZE)
         self.failed_background_image = pygame.transform.scale(pygame.image.load(join('images', 'ace', 'Failed.png')), self.SIZE)
         self.play_again_button_image = pygame.transform.scale(pygame.image.load(join('images', 'ace', 'Play Again.png')), (300, 150))
+        self.music1 = pygame.mixer.Sound(join('audio', 'BGM', 'Music 1.mp3'))
+        self.music2 = pygame.mixer.Sound(join('audio', 'BGM', 'Music 2.mp3'))
+        self.music3 = pygame.mixer.Sound(join('audio', 'BGM', 'Music 3.mp3'))
     # BGM
     def play_music_1(self):
         """Play intro music (Music 1) and loop it."""
-        pygame.mixer.music.load(join('audio', 'BGM', 'Music 1.mp3'))
-        pygame.mixer.music.play(loops=-1)
+        self.music1.play(loops=-1)
 
     def play_music_2(self):
         """Play game screen music (Music 2) without looping."""
-        pygame.mixer.music.load(join('audio', 'BGM', 'Music 2.mp3'))
-        pygame.mixer.music.play(loops=-1)
+        self.music2.play(loops=-1)
 
     def play_music_3(self):
         """Play score screen music (Music 3) and loop it."""
-        pygame.mixer.music.load(join('audio', 'BGM', 'Music 3.2.mp3'))
-        pygame.mixer.music.play(loops=-1)
+        self.music3.play(loops=-1)
 
     def stop_all_music(self):
-        """Stop all playing music."""
-        pygame.mixer.music.stop()
+        if not pygame.mixer.get_init():
+            pygame.mixer.init()
+            if pygame.mixer.get_init():  # Check if mixer is initialized
+                self.music1.stop()
+            else:
+                print("Mixer not initialized; cannot stop music.")
 
     # Fade-in function
     def fade_in(self, surface, image, duration=1.5):
@@ -524,7 +528,7 @@ class JumbleMania:
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    MainMenu(self.screen, self.gameStateManager)
+                    pygame.quit()
                     return
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if play_button_rect.collidepoint(event.pos):
@@ -542,7 +546,7 @@ class JumbleMania:
             self.screen.blit(self.background_intro, (0, 0))
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    MainMenu(self.screen, self.gameStateManager)
+                    pygame.quit()
                     return
             pygame.display.flip()
         self.show_instructions()
@@ -701,7 +705,7 @@ class JumbleMania:
             running = True
             clock = pygame.time.Clock()
             start_time = time.time()
-            time_limit = 180
+            time_limit = 15
 
             # Positioning code for letters and placeholders
             tile_start_x = self.SIZE[0] // 2 - (100 * len(scrambled) + 10 * (len(scrambled) - 1)) // 2
@@ -735,7 +739,7 @@ class JumbleMania:
 
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
-                        MainMenu(self.screen, self.gameStateManager)
+                        pygame.quit()
                         return
                     elif event.type == pygame.MOUSEBUTTONDOWN:
                         for letter in letters:
@@ -780,6 +784,7 @@ class JumbleMania:
     def show_score(self, score):
         self.stop_all_music()
         self.play_music_3()
+        print(self.screen)  # Should print a surface object, not None
         self.screen.blit(self.score_background_image, (0, 0))
         self.fade_in(self.screen, self.score_background_image, duration=1.5)
         self.draw_text(self.screen, f"{score}", self.score_font, self.VERY_DARK_BROWN, (self.SIZE[0] // 2, self.SIZE[1] // 2 + 63), align="center")
@@ -790,7 +795,7 @@ class JumbleMania:
             self.fade_in(self.screen, self.passed_background_image, duration=1.5)
             pygame.time.delay(5000)
             self.stop_all_music()
-            MainMenu(self.screen, self.gameStateManager)
+            pygame.quit()
             return
         else:
             self.fade_in(self.screen, self.failed_background_image, duration=1.5)
@@ -801,7 +806,7 @@ class JumbleMania:
             while True:
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
-                        MainMenu(self.screen, self.gameStateManager)
+                        pygame.quit()
                         return
                     elif event.type == pygame.MOUSEBUTTONDOWN:
                         if play_again_button_rect.collidepoint(event.pos):
@@ -831,15 +836,10 @@ class JumbleMania:
             elif game_state == "score":
                 self.show_score(score)  # Show score and handle play-again option
                 if score >= 3:
-                    running = False  # End game if passed
                     Maze(self.screen, self.gameStateManager, self.collide_points)
+                    running = False  # End game if passed
                 else:
                     game_state = "intro"  # Restart if failed
-
-            # Event handling to check for exit events at each game stage
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False
                     
 class MapMaestros:
     class PartOne:
