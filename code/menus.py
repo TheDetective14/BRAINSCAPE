@@ -1290,7 +1290,7 @@ class MapMaestros:
 
 class MathOlympus:
     def __init__(self, display, gameStateManager):
-        self.display_surface = display
+        self.screen = display
         self.gameStateManager = gameStateManager
         
         # Load images
@@ -1347,7 +1347,7 @@ class MathOlympus:
                 'active': False
             }
         }
-        self.instructions_bg = pygame.image.load("instructions.png")
+        self.instructions_bg = pygame.image.load(join('images', 'trisha', "instructions.png"))
         self.instructions_bg = pygame.transform.scale(self.instructions_bg, (WINDOW_WIDTH, WINDOW_HEIGHT))
 
 
@@ -1356,6 +1356,7 @@ class MathOlympus:
         self.pixel_font_feedback = pygame.font.Font(join('fonts', 'Benguiat.ttf'), 70)
         self.pixel_font_large = pygame.font.Font(join('fonts', 'Benguiat.ttf'), 42)
         self.pixel_font_small = pygame.font.Font(join('fonts', 'Benguiat.ttf'), 32)
+        self.pixel_font_instructions = pygame.font.Font(join('fonts', 'Benguiat.ttf'), 18)
 
         # Define colors
         self.white_text_color = (255, 255, 255)
@@ -1585,13 +1586,13 @@ class MathOlympus:
     # ANIMATION   
     def shake_screen(self, duration=200, intensity=5):
         """Shakes the screen when the player answers incorrectly."""
-        original_position = self.display_surface.get_rect()
+        original_position = self.screen.get_rect()
         shake_time = pygame.time.get_ticks()
         
         while pygame.time.get_ticks() - shake_time < duration:
             offset_x = random.randint(-intensity, intensity)
             offset_y = random.randint(-intensity, intensity)
-            self.display_surface.blit(self.question_bg_image, (offset_x, offset_y))
+            self.screen.blit(self.question_bg_image, (offset_x, offset_y))
             pygame.display.flip()
             pygame.time.delay(10)
         # Fade transition effect
@@ -1601,7 +1602,7 @@ class MathOlympus:
         fade_surface.fill((0, 0, 0))  # Black fade color
         for alpha in range(0, 255, int(255 / (duration / 20))):
             fade_surface.set_alpha(alpha)
-            self.display_surface.blit(fade_surface, (0, 0))
+            self.screen.blit(fade_surface, (0, 0))
             pygame.display.update()
             pygame.time.delay(20)
     
@@ -1610,7 +1611,7 @@ class MathOlympus:
         fade_surface.fill((0, 0, 0))  # Black fade color
         for alpha in range(0, 255, int(255 / (duration / 20))):
             fade_surface.set_alpha(alpha)
-            self.display_surface.blit(fade_surface, (0, 0))
+            self.screen.blit(fade_surface, (0, 0))
             pygame.display.update()
             pygame.time.delay(20)
     
@@ -1620,15 +1621,15 @@ class MathOlympus:
         Displays the player's remaining lives with live assets at the top right corner of the screen. 
         """
         lives_text = self.pixel_font_small.render("Lives:", True, self.white_text_color)
-        self.display_surface.blit(lives_text, (WINDOW_WIDTH - 60 - lives_text.get_width() - (self.lives_count * 30), 35))
+        self.screen.blit(lives_text, (WINDOW_WIDTH - 60 - lives_text.get_width() - (self.lives_count * 30), 35))
 
         for i in range(self.lives_count):
-            self.display_surface.blit(self.live_image, (WINDOW_WIDTH - 90 - (i * 30), 30))
+            self.screen.blit(self.live_image, (WINDOW_WIDTH - 90 - (i * 30), 30))
 
     def draw_timer(self, remaining_time):
         """Draws the countdown timer on the screen."""
         timer_text = self.pixel_font_small.render(f"Time: {remaining_time // 1000}", True, self.white_text_color)
-        self.display_surface.blit(timer_text, (WINDOW_WIDTH - 450, 35))
+        self.screen.blit(timer_text, (WINDOW_WIDTH - 450, 35))
 
     def handle_timer(self):
         """Handles the timer and deducts life if time runs out."""
@@ -1655,13 +1656,13 @@ class MathOlympus:
         Display the player's score at the top-left corner of the screen.
         """
         score_text = self.pixel_font_small.render(f"Score: {self.score}/{self.total_questions}", True, self.white_text_color)
-        self.display_surface.blit(score_text, (30, 35))
+        self.screen.blit(score_text, (30, 35))
 
     # FEEDBACK MECHANISM
     def show_feedback(self, is_correct):
         """Display feedback to the user indicating whether they got the correct answer or not."""
         feedback_image = self.positive_feedback_image if is_correct else self.negative_feedback_image
-        self.display_surface.blit(feedback_image, (0, 0))
+        self.screen.blit(feedback_image, (0, 0))
 
         feedback_message = random.choice(self.positive_feedbacks) if is_correct else random.choice(self.negative_feedbacks)
      
@@ -1689,12 +1690,12 @@ class MathOlympus:
             line_x = (max_text_width - line_surface.get_width()) // 2 
             full_text_surface.blit(line_surface, (line_x, i * self.pixel_font_feedback.get_height()))
 
-        self.fade_in_text(self.display_surface, full_text_surface, pygame.Rect((WINDOW_WIDTH - max_text_width) // 2, text_y, max_text_width, text_block_height), speed=10)
+        self.fade_in_text(self.screen, full_text_surface, pygame.Rect((WINDOW_WIDTH - max_text_width) // 2, text_y, max_text_width, text_block_height), speed=10)
 
         pygame.display.flip()
         pygame.time.wait(1000)
          
-        self.fade_out_text(self.display_surface, full_text_surface, pygame.Rect((WINDOW_WIDTH - max_text_width) // 2, text_y, max_text_width, text_block_height), speed=10)
+        self.fade_out_text(self.screen, full_text_surface, pygame.Rect((WINDOW_WIDTH - max_text_width) // 2, text_y, max_text_width, text_block_height), speed=10)
         pygame.event.clear()
         pygame.display.flip()
 
@@ -1704,7 +1705,7 @@ class MathOlympus:
         Displays the start screen and waits for user input to start the game.
         """
         while True:
-            self.display_surface.blit(self.run_image, (0, 0))  # Show main menu image
+            self.screen.blit(self.run_image, (0, 0))  # Show main menu image
             pygame.display.flip()
 
             for event in pygame.event.get():
@@ -1723,16 +1724,43 @@ class MathOlympus:
         if is_successful:
             self.fade_transition()
             self.fade_out()
-            self.display_surface.blit(self.congratulations_image, (0, 0))
+            self.screen.blit(self.congratulations_image, (0, 0))
         else:
+            self.collide_points = {
+                'yellow': {
+                    'rect': pygame.Rect(1460, 1539, 100, 100),
+                    'active': False
+                },
+                'green': {
+                    'rect': pygame.Rect(2648, 1842, 100, 100),
+                    'active': True
+                },
+                'blue': {
+                    'rect': pygame.Rect(2722, 908, 100, 100),
+                    'active': False
+                },
+                'orange': {
+                    'rect': pygame.Rect(1700, 672, 100, 100),
+                    'active': False
+                },
+                'red': {
+                    'rect': pygame.Rect(2134, 1632, 100, 100),
+                    'active': True
+                },
+                'purple': {
+                    'rect': pygame.Rect(2081, 1135, 100, 100),
+                    'active': False
+                }
+            }
             self.fade_transition()
             self.fade_out()
-            self.display_surface.blit(self.failure_image, (0, 0))
+            self.screen.blit(self.failure_image, (0, 0))        
         pygame.display.flip()
         pygame.time.wait(3000)
 
 
         # INSTRUCTIONS 
+   
     def display_instructions(self):
         """
         Displays the instructions screen with a typewriter animation effect and waits for the user to press a key to start.
@@ -1807,7 +1835,6 @@ class MathOlympus:
                     waiting = False
                 if event.type == pygame.KEYDOWN and typing_finished:
                     waiting = False
-
 
     #GAME LOOP
     def run_game_loop(self):
@@ -1894,7 +1921,7 @@ class MathOlympus:
         self.run_game_loop()  # Start the game loop
         self.fade_transition()
         self.fade_out()
-        Maze(self.display_surface, self.gameStateManager, self.collide_points).run()
+        Maze(self.screen, self.gameStateManager, self.collide_points).run()
 
 class SequenceSurge:
     def __init__(self, display, gameStateManager):
@@ -2570,14 +2597,6 @@ class MazeTrazze:
 
             pygame.display.flip()
             clock.tick(60)
-
-class FinalGame:
-    def __init__(self, display, gameStateManager):
-        self.display_surface = display
-        self.gameStateManager = gameStateManager
-
-    def run(self):
-        Maze(self.display_surface, self.gameStateManager).run()
 
 class CreditsScene:
     def __init__(self, display, gameStateManager):
