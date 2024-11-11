@@ -163,6 +163,83 @@ class Library:
             # Update the display
             pygame.display.update()
 
+    def transition(self):
+        # Load video using OpenCV
+        video_path = join('images', 'josh', 'portal_magic.mp4')
+        cap = cv2.VideoCapture(video_path)
+
+        # Get video dimensions
+        width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+        height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+
+        # Calculate aspect ratio
+        video_aspect_ratio = width / height
+        screen_aspect_ratio = WINDOW_WIDTH / WINDOW_HEIGHT
+
+        # Video speed control
+        speed_factor = 1000  # Adjust this value for speed control (1.0 is normal speed)
+
+        # Initialize audio
+        pygame.mixer.init()
+        audio_path = join('audio', 'SFX', 'portal_magic.mp3')  # Assuming the MP3 file is named "portal_magic.mp3"
+        audio = pygame.mixer.Sound(audio_path)  # Load audio from the MP3 file
+        audio.play()  # Start playing the audio
+
+        # Game loop
+        running = True
+        video_playing = True  # Flag to track video playback
+        while running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+
+            if video_playing:
+                # Read a frame from the video
+                ret, frame = cap.read()
+                if ret:
+                    # Calculate scaling factors to maintain aspect ratio
+                    # Adjust these values to control the size
+                    scale_factor = 1.0  # Increase this value for larger video
+                    new_width = int(width * scale_factor)
+                    new_height = int(height * scale_factor)
+
+                    # Resize the frame
+                    frame = cv2.resize(frame, (new_width, new_height))
+
+                    # Convert frame to RGB (OpenCV uses BGR)
+                    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+                    # Rotate the frame 90 degrees clockwise
+                    frame = cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE)
+
+                    # Create a Pygame surface from the frame
+                    frame_surface = pygame.surfarray.make_surface(frame)
+
+                    # Adjust position to lower and left
+                    x_offset = (WINDOW_WIDTH - new_width) // 2  # Center horizontally
+                    y_offset = (WINDOW_HEIGHT - new_height) // 2  # Center vertically
+
+                    # Blit the surface onto the screen
+                    self.display_surface.blit(frame_surface, (x_offset, y_offset))
+                    # Update display
+                    pygame.display.flip()
+
+                    # Delay for speed control
+                    time.sleep(1 / (cap.get(cv2.CAP_PROP_FPS) * speed_factor))
+                else:
+                    # Video finished, set flag
+                    video_playing = False
+                    cap.release()  # Release the video capture object
+                    audio.stop()  # Stop playing the audio
+
+            else:
+                # Display a black self.display_surface after video ends
+                self.display_surface.fill((0, 0, 0))  # Fill with black
+                running = False
+
+            # Update the display
+            pygame.display.flip()
+
     def run(self):
         while self.running:
             dt = self.clock.tick() / 1000
@@ -171,6 +248,7 @@ class Library:
                     self.running = False
 
             if self.player.hitbox_rect.colliderect(self.collide_points['maze']):
+                self.transition()
                 self.gameStateManager.set_state('Maze')
                 Maze(self.display_surface, self.gameStateManager, self.maze_collide_points).run()
             if self.player.hitbox_rect.colliderect(self.collide_points['locked']):
