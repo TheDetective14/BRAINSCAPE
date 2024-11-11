@@ -3,6 +3,11 @@ from sprites import *
 from groups import *
 from player import Player
 from dialouge import DialogueSystem
+import moviepy.editor as mp
+import pygame
+import time
+from os.path import join
+import random
 
 class MainMenu:
     def __init__(self, display, gameStateManager):
@@ -145,7 +150,7 @@ class Library:
 
             if self.player.hitbox_rect.colliderect(self.collide_points['maze']):
                 self.gameStateManager.set_state('Maze')
-                Maze(self.display_surface, self.gameStateManager).run()
+                MapMaestros(self.display_surface, self.gameStateManager).run()
             if self.player.hitbox_rect.colliderect(self.collide_points['locked']):
                 self.reject_access()
                 self.gameStateManager.set_state('Library')
@@ -724,6 +729,7 @@ class JumbleMania:
                     running = False
 
 class MapMaestros:
+<<<<<<< Updated upstream
     class PartOne:
         class MainMenu:
             def __init__(self, display, gameStateManager):
@@ -746,18 +752,42 @@ class MapMaestros:
                 self.first_frame = frame
                 self.video_width, self.video_height = self.first_frame.shape[:2]
                 self.screen_aspect_ratio = self.screen_width / self.screen_height
+=======
+    pass 
+
+# Part One: Main Menu and Instructions
+class MapMaestros:
+    def __init__(self, display, gameStateManager):
+        self.display_surface = display
+        self.gameStateManager = gameStateManager
+    class PartOne:
+        class MainMenu:
+            def __init__(self):
+                # Load videos
+                self.video_clip = mp.VideoFileClip("star_backs.mp4")
+                self.video_duration = self.video_clip.duration
+                self.first_frame = self.video_clip.get_frame(0)
+                self.video_width, self.video_height = self.first_frame.shape[:2]
+                self.screen_aspect_ratio = WINDOW_WIDTH / WINDOW_HEIGHT
+>>>>>>> Stashed changes
                 self.video_aspect_ratio = self.video_width / self.video_height
                 self.zoom_factor = 1.0
                 self.current_frame = 0
                 self.frame_time = 0
 
                 # Load button images
+<<<<<<< Updated upstream
                 self.start_button_image = pygame.image.load(join('images', 'josh', 'start_button.png')).convert_alpha()
                 self.exit_button_image = pygame.image.load(join('images', 'josh', 'exit_button.png')).convert_alpha()
+=======
+                self.start_button_image = pygame.image.load("start_button.png").convert_alpha()
+                self.exit_button_image = pygame.image.load("exit_button.png").convert_alpha()
+>>>>>>> Stashed changes
                 self.start_button_image = pygame.transform.scale(self.start_button_image, (self.start_button_image.get_width() // 3, self.start_button_image.get_height() // 3))
                 self.exit_button_image = pygame.transform.scale(self.exit_button_image, (self.exit_button_image.get_width() // 3, self.exit_button_image.get_height() // 3))
 
                 # Set button positions
+<<<<<<< Updated upstream
                 self.start_button_rect = self.start_button_image.get_rect(center=(self.screen_width // 2 - 15, self.screen_height // 2 + 150))
                 self.exit_button_rect = self.exit_button_image.get_rect(center=(self.screen_width // 2 - 15, self.screen_height // 2 + 250))
 
@@ -766,6 +796,16 @@ class MapMaestros:
                 pygame.mixer.music.play(-1)  # Play on a loop
 
             def run(self):
+=======
+                self.start_button_rect = self.start_button_image.get_rect(center=(WINDOW_WIDTH // 2 - 15, WINDOW_HEIGHT // 2 + 150))
+                self.exit_button_rect = self.exit_button_image.get_rect(center=(WINDOW_WIDTH // 2 - 15, WINDOW_HEIGHT // 2 + 250))
+
+                # Load and play background music
+                pygame.mixer.music.load("main_menusound.mp3")
+                pygame.mixer.music.play(-1)  # Play on a loop
+
+            def run_game(self):
+>>>>>>> Stashed changes
                 # Game loop
                 running = True
                 while running:
@@ -775,7 +815,11 @@ class MapMaestros:
                             running = False
                         if event.type == pygame.MOUSEBUTTONDOWN:
                             if self.start_button_rect.collidepoint(event.pos):
+<<<<<<< Updated upstream
                                 instructions = MapMaestros.PartOne.Instructions(self.gameStateManager)
+=======
+                                instructions = MapMaestros.PartOne.Instructions()
+>>>>>>> Stashed changes
                                 instructions.run_game()
                                 running = False 
                             if self.exit_button_rect.collidepoint(event.pos):
@@ -783,18 +827,30 @@ class MapMaestros:
 
                     # Update the frame (for all screens)
                     current_time = pygame.time.get_ticks() / 1000
+<<<<<<< Updated upstream
                     if current_time - self.frame_time >= self.video_duration / (self.fps * 12):
                         self.current_frame = (self.current_frame + 1) % int(self.video_duration * self.fps)
                         self.frame_time = current_time
                         ret, frame = self.video_clip.read()
+=======
+                    if current_time - self.frame_time >= self.video_duration / (self.video_clip.fps * 12):
+                        self.current_frame = (self.current_frame + 1) % int(self.video_duration * self.video_clip.fps)
+                        self.frame_time = current_time
+                        frame = self.video_clip.get_frame(self.current_frame / self.video_clip.fps)
+>>>>>>> Stashed changes
                         video_surface = pygame.transform.scale(
                             pygame.surfarray.make_surface(frame.astype('uint8')),
                             (int(self.video_width * self.zoom_factor), int(self.video_height * self.zoom_factor))
                         )
                         video_surface = pygame.transform.flip(video_surface, True, False)
                         video_surface = pygame.transform.rotate(video_surface, 90)
+<<<<<<< Updated upstream
                         x_offset = (self.screen_width - video_surface.get_width()) // 2
                         y_offset = (self.screen_height - video_surface.get_height()) // 2
+=======
+                        x_offset = (WINDOW_WIDTH - video_surface.get_width()) // 2
+                        y_offset = (WINDOW_HEIGHT - video_surface.get_height()) // 2
+>>>>>>> Stashed changes
 
                     # Draw background
                     self.screen.blit(video_surface, (x_offset, y_offset))
@@ -810,6 +866,7 @@ class MapMaestros:
                 pygame.quit()
 
         class Instructions:
+<<<<<<< Updated upstream
             def __init__(self, gameStateManager):
                 # Initialize Pygame
                 pygame.init()
@@ -824,11 +881,27 @@ class MapMaestros:
                 # Load images
                 self.background_image = pygame.image.load(join('images', 'josh', 'instructions.png')).convert()
                 self.next_button_image = pygame.image.load(join('images', 'josh', "next_button.png")).convert_alpha()
+=======
+            def __init__(self):
+                # Initialize Pygame
+                pygame.init()
+
+                # Screen dimensions
+                WINDOW_WIDTH = 1280
+                WINDOW_HEIGHT = 720
+                self.screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+                pygame.display.set_caption("Map Maestros - Instructions")
+
+                # Load images
+                self.background_image = pygame.image.load("instructions.png").convert()
+                self.next_button_image = pygame.image.load("next_button.png").convert_alpha()
+>>>>>>> Stashed changes
 
                 # Resize the "next_button" image (adjust the dimensions as needed)
                 self.next_button_image = pygame.transform.scale(self.next_button_image, (300, 200))
 
                 # Set button position
+<<<<<<< Updated upstream
                 self.next_button_rect = self.next_button_image.get_rect(bottomright=(self.screen_width - 20, self.screen_height - 20))
 
                 # Load and convert images to PNG format
@@ -840,6 +913,19 @@ class MapMaestros:
                 # Set box positions (center on the screen)
                 self.blue_box_rect = self.blue_box_image.get_rect(center=(self.screen_width // 2, self.screen_height // 2 + 50))
                 self.red_box_rect = self.red_box_image.get_rect(center=(self.screen_width // 2, self.screen_height // 2 + 40))
+=======
+                self.next_button_rect = self.next_button_image.get_rect(bottomright=(WINDOW_WIDTH - 20, WINDOW_HEIGHT - 20))
+
+                # Load and convert images to PNG format
+                self.blue_box_image = pygame.image.load("map_text2.png").convert_alpha()
+                self.blue_box_image = pygame.transform.scale(self.blue_box_image, (500,300))
+                self.red_box_image = pygame.image.load("map_text1.png").convert_alpha()
+                self.red_box_image = pygame.transform.scale(self.red_box_image, (600,300))
+
+                # Set box positions (center on the screen)
+                self.blue_box_rect = self.blue_box_image.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2 + 50))
+                self.red_box_rect = self.red_box_image.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2 + 40))
+>>>>>>> Stashed changes
 
                 # Set box visibility
                 self.show_blue_box = True
@@ -865,7 +951,11 @@ class MapMaestros:
                                     pygame.mixer.music.stop()
 
                                     # Start the PartTwo class
+<<<<<<< Updated upstream
                                     countdown_screen = MapMaestros.PartTwo.CountdownScreen(self.gameStateManager)
+=======
+                                    countdown_screen = MapMaestros.PartTwo.CountdownScreen()
+>>>>>>> Stashed changes
                                     countdown_screen.run()
                                     self.transition_to_countdown()
                                     running = False
@@ -902,6 +992,7 @@ class MapMaestros:
     # Part Two: Countdown Screen
     class PartTwo:
         class CountdownScreen:
+<<<<<<< Updated upstream
             def __init__(self, gameStateManager):
                 # Initialize Pygame
                 pygame.init()
@@ -915,12 +1006,30 @@ class MapMaestros:
 
                 # Load countdown image
                 self.countdown_image = pygame.image.load(join('images', 'josh', "countdown.png")).convert_alpha()
+=======
+            def __init__(self):
+                # Initialize Pygame
+                pygame.init()
+
+                # Screen dimensions
+                WINDOW_WIDTH = 1280
+                WINDOW_HEIGHT = 720
+                self.screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+                pygame.display.set_caption("Countdown")
+
+                # Load countdown image
+                self.countdown_image = pygame.image.load("countdown.png").convert_alpha()
+>>>>>>> Stashed changes
 
                 # Set initial countdown value
                 self.countdown_value = 3
 
                 # Load and play countdown music
+<<<<<<< Updated upstream
                 self.countdown_music = pygame.mixer.Sound(join('audio', 'SFX', "countdown_sound.mp3"))
+=======
+                self.countdown_music = pygame.mixer.Sound("countdown_sound.mp3")
+>>>>>>> Stashed changes
                 self.countdown_music.play()
 
             def run(self):
@@ -959,6 +1068,7 @@ class MapMaestros:
                 time.sleep(0.3)  # Adjust sleep duration for fade speed
 
             # Start the PartTwo class
+<<<<<<< Updated upstream
             countdown_screen = MapMaestros.PartTwo.CountdownScreen(self.gameStateManager)  # Directly start PartTwo
             countdown_screen.run()
 
@@ -978,18 +1088,48 @@ class MapMaestros:
                 self.number_three = pygame.image.load(join('images', 'josh', 'number_three.png')).convert_alpha()
                 self.number_two = pygame.image.load(join('images', 'josh', 'number_two.png')).convert_alpha()
                 self.number_one = pygame.image.load(join('images', 'josh', 'number_one.png')).convert_alpha()
+=======
+            countdown_screen = MapMaestros.PartTwo.CountdownScreen()  # Directly start PartTwo
+            countdown_screen.run()
+
+
+
+    class PartTwo:
+        class CountdownScreen:
+            def __init__(self):
+                pygame.init()
+                self.screen = pygame.display.set_mode((1280, 720))
+                pygame.display.set_caption("Countdown")
+
+                WINDOW_WIDTH, WINDOW_HEIGHT = self.screen.get_size()
+                self.background_image = pygame.image.load(join('images', 'actual_laro.png')).convert_alpha()
+                self.background_image = pygame.transform.scale(self.background_image, (1280, 720))
+
+                # Load the PNG images for countdown numbers
+                self.number_three = pygame.image.load(join('images', 'number_three.png')).convert_alpha()
+                self.number_two = pygame.image.load(join('images', 'number_two.png')).convert_alpha()
+                self.number_one = pygame.image.load(join('images', 'number_one.png')).convert_alpha()
+>>>>>>> Stashed changes
 
                 # Resize countdown images to be smaller
                 self.number_three = pygame.transform.scale(self.number_three, (300, 300))  # Adjust size here
                 self.number_two = pygame.transform.scale(self.number_two, (390, 300))      # Adjust size here
                 self.number_one = pygame.transform.scale(self.number_one, (300, 300))      # Adjust size here
                 pygame.mixer.init()
+<<<<<<< Updated upstream
                 self.music = pygame.mixer.music.load(join('audio', 'SFX', 'count_downmusic.mp3'))
+=======
+                self.music = pygame.mixer.music.load(join('audio', 'count_downmusic.mp3'))
+>>>>>>> Stashed changes
             def display_countdown(self):
                 countdown_images = [self.number_three, self.number_two, self.number_one]
                 for img in countdown_images:
                     self.screen.blit(self.background_image, (0, 0))  # Blit background
+<<<<<<< Updated upstream
                     img_rect = img.get_rect(center=(self.screen_width // 2, self.screen_height // 2 + 50))  # Adjust position lower
+=======
+                    img_rect = img.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2 + 50))  # Adjust position lower
+>>>>>>> Stashed changes
                     self.screen.blit(img, img_rect)  # Blit countdown image
                     pygame.display.flip()
                     pygame.time.wait(1000)  # Wait for 1 second
@@ -999,11 +1139,16 @@ class MapMaestros:
                 pygame.mixer.init()
                 self.display_countdown()
 
+<<<<<<< Updated upstream
                 game = MapMaestros.PartThree.ContinentMatchGame(self.gameStateManager)
+=======
+                game = MapMaestros.PartThree.ContinentMatchGame()
+>>>>>>> Stashed changes
                 game.run()    
 
     class PartThree:        
         class ContinentMatchGame:
+<<<<<<< Updated upstream
             def __init__(self, gameStateManager):
                 pygame.init()
                 self.screen = pygame.display.set_mode((1280, 720))
@@ -1019,6 +1164,22 @@ class MapMaestros:
                 
                 self.box_width, self.box_height = 180, 160
                 self.ice_cube_image = pygame.image.load(join('images', 'josh', 'ice_cube.png')).convert_alpha()
+=======
+            def __init__(self):
+                pygame.init()
+                self.screen = pygame.display.set_mode((1280, 720))
+                pygame.display.set_caption("Continent Match")
+
+                WINDOW_WIDTH, WINDOW_HEIGHT = self.screen.get_size()
+                self.background_image = pygame.image.load(join('images', 'actual_game.png')).convert_alpha()
+                self.background_image = pygame.transform.scale(self.background_image, (1280, 720))
+
+                self.box_image = pygame.image.load(join('images', 'the_box.png')).convert_alpha()
+                self.box_image = pygame.transform.scale(self.box_image, (WINDOW_WIDTH, WINDOW_HEIGHT))
+                
+                self.box_width, self.box_height = 180, 160
+                self.ice_cube_image = pygame.image.load(join('images', 'ice_cube.png')).convert_alpha()
+>>>>>>> Stashed changes
                 self.ice_cube_image = pygame.transform.scale(self.ice_cube_image, (self.box_width, self.box_height))
 
             
@@ -1031,9 +1192,15 @@ class MapMaestros:
                 self.dark_cyan = (0, 139, 139)         # Dark cyan for continent and country text
 
                 # Load fonts
+<<<<<<< Updated upstream
                 self.font = pygame.font.Font(join('fonts', 'Benguiat.ttf'), 36)
                 self.small_font = pygame.font.Font(join('fonts', 'Benguiat.ttf'), 28)
                 self.timer_font = pygame.font.Font(join('fonts', 'Benguiat.ttf'), 32)
+=======
+                self.font = pygame.font.Font(join('fonts', 'benguiat.ttf'), 36)
+                self.small_font = pygame.font.Font(join('fonts', 'benguiat.ttf'), 28)
+                self.timer_font = pygame.font.Font(join('fonts', 'benguiat.ttf'), 32)
+>>>>>>> Stashed changes
 
                 self.countries = [
         ("Brazil", "South America"), ("Nigeria", "Africa"), ("China", "Asia"), 
@@ -1060,6 +1227,7 @@ class MapMaestros:
                 self.reset_game()
 
                 # Load PNG images
+<<<<<<< Updated upstream
                 self.try_again_image = pygame.image.load(join('images', 'josh', 'try_again.png')).convert_alpha()
                 # Assuming 1cm = 37.7953 pixels (approximately)
                 self.try_again_image = pygame.transform.scale(self.try_again_image, (int(10 * 37.7953), int(10 * 37.7953)))  
@@ -1067,6 +1235,15 @@ class MapMaestros:
                 self.exit_button_image = pygame.transform.scale(self.exit_button_image, (200, 90))
                 self.you_won_image = pygame.image.load(join('images', 'josh', 'you_won.png')).convert_alpha()
                 self.you_won_image = pygame.transform.scale(self.you_won_image, (self.screen_width // 2, self.screen_height // 2))
+=======
+                self.try_again_image = pygame.image.load(join('images', 'try_again.png')).convert_alpha()
+                # Assuming 1cm = 37.7953 pixels (approximately)
+                self.try_again_image = pygame.transform.scale(self.try_again_image, (int(10 * 37.7953), int(10 * 37.7953)))  
+                self.exit_button_image = pygame.image.load(join('images', 'exit_button.png')).convert_alpha()
+                self.exit_button_image = pygame.transform.scale(self.exit_button_image, (200, 90))
+                self.you_won_image = pygame.image.load(join('images', 'you_won.png')).convert_alpha()
+                self.you_won_image = pygame.transform.scale(self.you_won_image, (WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2))
+>>>>>>> Stashed changes
 
             def reset_game(self):
                 random.shuffle(self.countries)
@@ -1078,9 +1255,15 @@ class MapMaestros:
                 self.running = True
                 self.show_try_again = False
 
+<<<<<<< Updated upstream
                 top_row_start_x = (self.screen_width - (4 * 150 + 3 * self.gap_x)) // 2
                 bottom_row_start_x = (self.screen_width - (3 * 150 + 2 * self.gap_x)) // 2
                 top_row_y = (self.screen_height - 2 * 140 - self.gap_y) // 2
+=======
+                top_row_start_x = (WINDOW_WIDTH - (4 * 150 + 3 * self.gap_x)) // 2
+                bottom_row_start_x = (WINDOW_WIDTH - (3 * 150 + 2 * self.gap_x)) // 2
+                top_row_y = (WINDOW_HEIGHT - 2 * 140 - self.gap_y) // 2
+>>>>>>> Stashed changes
                 bottom_row_y = top_row_y + 140 + self.gap_y
                 
                 self.continents = {
@@ -1093,21 +1276,36 @@ class MapMaestros:
                     "Antarctica": pygame.Rect(bottom_row_start_x + 2 * (150 + self.gap_x), bottom_row_y, 150, 140)
                 }
 
+<<<<<<< Updated upstream
                 self.country_rect = pygame.Rect((self.screen_width - self.box_width) // 2, bottom_row_y + 140 + self.gap_y, self.box_width, self.box_height)
                 self.country_rect_original_pos = self.country_rect.topleft
                 # Assuming 1cm = 37.7953 pixels (approximately)
                 self.try_again_button = pygame.Rect((self.screen_width // 2 - int(10 * 37.7953) // 2), self.screen_height // 2 - int(10 * 37.7953) // 2, int(10 * 37.7953), int(10 * 37.7953))  
                 self.exit_button = pygame.Rect((self.screen_width - 200) // 2, self.screen_height // 2 + 120, 200, 50) # Moved exit button down
+=======
+                self.country_rect = pygame.Rect((WINDOW_WIDTH - self.box_width) // 2, bottom_row_y + 140 + self.gap_y, self.box_width, self.box_height)
+                self.country_rect_original_pos = self.country_rect.topleft
+                # Assuming 1cm = 37.7953 pixels (approximately)
+                self.try_again_button = pygame.Rect((WINDOW_WIDTH // 2 - int(10 * 37.7953) // 2), WINDOW_HEIGHT // 2 - int(10 * 37.7953) // 2, int(10 * 37.7953), int(10 * 37.7953))  
+                self.exit_button = pygame.Rect((WINDOW_WIDTH - 200) // 2, WINDOW_HEIGHT // 2 + 120, 200, 50) # Moved exit button down
+>>>>>>> Stashed changes
 
                 self.timer_x = self.country_rect.x - 200
                 self.score_x = self.country_rect.x + self.country_rect.width + 50
                 self.text_y = self.country_rect.y
 
             def get_fitting_font(self, text, rect_width, rect_height, max_font_size=48):
+<<<<<<< Updated upstream
                 fitting_font = pygame.font.Font(join('fonts', 'Benguiat.ttf'), max_font_size)
                 while fitting_font.size(text)[0] > rect_width - 10 or fitting_font.size(text)[1] > rect_height - 10:
                     max_font_size -= 2
                     fitting_font = pygame.font.Font(join('fonts', 'Benguiat.ttf'), max_font_size)
+=======
+                fitting_font = pygame.font.Font(join('fonts', 'benguiat.ttf'), max_font_size)
+                while fitting_font.size(text)[0] > rect_width - 10 or fitting_font.size(text)[1] > rect_height - 10:
+                    max_font_size -= 2
+                    fitting_font = pygame.font.Font(join('fonts', 'benguiat.ttf'), max_font_size)
+>>>>>>> Stashed changes
                 return fitting_font
 
             def run(self):
@@ -1193,7 +1391,11 @@ class MapMaestros:
 
             def display_text(self, message, font, color=(255, 0, 0)):
                 text_surface = font.render(message, True, color)
+<<<<<<< Updated upstream
                 text_rect = text_surface.get_rect(center=(self.screen_width // 2, self.screen_height // 2))
+=======
+                text_rect = text_surface.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2))
+>>>>>>> Stashed changes
                 self.screen.blit(text_surface, text_rect)
                 pygame.display.flip()
 
@@ -1202,7 +1404,11 @@ class MapMaestros:
 
             def display_win_screen(self):
                 # Display "YOU WON!" message
+<<<<<<< Updated upstream
                 self.screen.blit(self.you_won_image, (self.screen_width // 2 - self.you_won_image.get_width() // 2, self.screen_height // 2 - self.you_won_image.get_height() // 2)) 
+=======
+                self.screen.blit(self.you_won_image, (WINDOW_WIDTH // 2 - self.you_won_image.get_width() // 2, WINDOW_HEIGHT // 2 - self.you_won_image.get_height() // 2)) 
+>>>>>>> Stashed changes
                 # Draw button
                 self.screen.blit(self.exit_button_image, self.exit_button.topleft)
                 pygame.display.flip()
@@ -1215,7 +1421,12 @@ class MapMaestros:
                             exit()
                         if event.type == pygame.MOUSEBUTTONDOWN:
                             if self.exit_button.collidepoint(event.pos):
+<<<<<<< Updated upstream
                                 Maze(self.screen, self.gameStateManager).run()
+=======
+                                pygame.quit()
+                                exit()
+>>>>>>> Stashed changes
             def display_lose_screen(self):
                 # Draw buttons
                 self.screen.blit(self.try_again_image, self.try_again_button.topleft)
@@ -1233,8 +1444,20 @@ class MapMaestros:
                                 self.reset_game()
                                 return
                             elif self.exit_button.collidepoint(event.pos):
+<<<<<<< Updated upstream
                                 Maze(self.screen, self.gameStateManager).run()
                     pygame.quit()
+=======
+                                pygame.quit()
+                                exit()
+
+                pygame.quit()               
+
+# Start the game
+if __name__ == "__main__":
+    main_menu = MapMaestros.PartOne.MainMenu()
+    main_menu.run_game()
+>>>>>>> Stashed changes
 
 class MathOlympus:
     def __init__(self, display, gameStateManager):
