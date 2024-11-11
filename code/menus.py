@@ -79,6 +79,33 @@ class Library:
                 'locked': pygame.Rect(494, 288, 100, 100)
             }
         
+        self.maze_collide_points = {
+            'yellow': {
+                'rect': pygame.Rect(1460, 1539, 100, 100),
+                'active': True
+            },
+            'green': {
+                'rect': pygame.Rect(2648, 1842, 100, 100),
+                'active': True
+            },
+            'blue': {
+                'rect': pygame.Rect(2722, 908, 100, 100),
+                'active': True
+            },
+            'orange': {
+                'rect': pygame.Rect(1700, 672, 100, 100),
+                'active': True
+            },
+            'red': {
+                'rect': pygame.Rect(2134, 1632, 100, 100),
+                'active': True
+            },
+            'purple': {
+                'rect': pygame.Rect(2081, 1135, 100, 100),
+                'active': True
+            }
+        }
+        
         self.dialogue_lines = [
             "Hello, welcome to the game!",
             "This is an example of a dialogue system in Pygame.",
@@ -145,7 +172,7 @@ class Library:
 
             if self.player.hitbox_rect.colliderect(self.collide_points['maze']):
                 self.gameStateManager.set_state('Maze')
-                Maze(self.display_surface, self.gameStateManager).run()
+                Maze(self.display_surface, self.gameStateManager, self.maze_collide_points).run()
             if self.player.hitbox_rect.colliderect(self.collide_points['locked']):
                 self.reject_access()
                 self.gameStateManager.set_state('Library')
@@ -162,7 +189,7 @@ class Library:
         pygame.quit()
 
 class Maze:
-    def __init__(self, display, gameStateManager):
+    def __init__(self, display, gameStateManager, collide_points):
         self.display_surface = display
         self.gameStateManager = gameStateManager
         self.running = True
@@ -170,32 +197,7 @@ class Maze:
         self.all_sprites = AllSprites()
         self.collision_sprites = pygame.sprite.Group()
 
-        self.collide_points = {
-            'yellow': {
-                'rect': pygame.Rect(1460, 1539, 100, 100),
-                'active': True
-            },
-            'green': {
-                'rect': pygame.Rect(2648, 1842, 100, 100),
-                'active': True
-            },
-            'blue': {
-                'rect': pygame.Rect(2722, 908, 100, 100),
-                'active': True
-            },
-            'orange': {
-                'rect': pygame.Rect(1700, 672, 100, 100),
-                'active': True
-            },
-            'red': {
-                'rect': pygame.Rect(2134, 1632, 100, 100),
-                'active': True
-            },
-            'purple': {
-                'rect': pygame.Rect(2081, 1135, 100, 100),
-                'active': True
-            }
-        }
+        self.collide_points = collide_points
 
         # self.music = pygame.mixer.Sound(join('audio', 'BGM', 'Background Music.mp3'))
         # self.music.play(loops = -1)
@@ -237,7 +239,7 @@ class Maze:
             if blue_point['active'] and self.player.hitbox_rect.colliderect(blue_point['rect']):
                 self.gameStateManager.set_state('blue')
                 blue_point['active'] = False
-                MapMaestros(self.display_surface, self.gameStateManager).run()
+                MapMaestros.PartOne.MainMenu(self.display_surface, self.gameStateManager).run()
             if orange_point['active'] and self.player.hitbox_rect.colliderect(orange_point['rect']):
                 self.gameStateManager.set_state('orange')
                 orange_point['active'] = False
@@ -282,6 +284,33 @@ class JumbleMania:
         self.definition_font = pygame.font.Font(self.custom_font_path, 30)
         self.time_font = pygame.font.Font(self.custom_font_path, 24)
         self.score_font = pygame.font.Font(self.custom_font_path, 135)
+
+        self.collide_points = {
+            'yellow': {
+                'rect': pygame.Rect(1460, 1539, 100, 100),
+                'active': False
+            },
+            'green': {
+                'rect': pygame.Rect(2648, 1842, 100, 100),
+                'active': True
+            },
+            'blue': {
+                'rect': pygame.Rect(2722, 908, 100, 100),
+                'active': False
+            },
+            'orange': {
+                'rect': pygame.Rect(1700, 672, 100, 100),
+                'active': False
+            },
+            'red': {
+                'rect': pygame.Rect(2134, 1632, 100, 100),
+                'active': False
+            },
+            'purple': {
+                'rect': pygame.Rect(2081, 1135, 100, 100),
+                'active': False
+            }
+        }
 
         # Load and scale images
         self.background_intro = pygame.transform.scale(pygame.image.load(join('images', 'ace', 'Minigame menu.png')), self.SIZE)
@@ -568,8 +597,6 @@ class JumbleMania:
         # Ensure the arranged word exactly matches the target word
         return arranged_word == word
 
-
-    # Main game function with automatic answer checking on time out
     # Main game function with automatic answer checking on time out
     def play_game(self):
         self.stop_all_music()
@@ -721,7 +748,7 @@ class JumbleMania:
             # Event handling to check for exit events at each game stage
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    running = False
+                    Maze(self.screen, self.gameStateManager, self.collide_points)
 
 class MapMaestros:
     class PartOne:
@@ -1021,7 +1048,32 @@ class MapMaestros:
                 self.ice_cube_image = pygame.image.load(join('images', 'josh', 'ice_cube.png')).convert_alpha()
                 self.ice_cube_image = pygame.transform.scale(self.ice_cube_image, (self.box_width, self.box_height))
 
-            
+                self.collide_points = {
+                    'yellow': {
+                        'rect': pygame.Rect(1460, 1539, 100, 100),
+                        'active': True
+                    },
+                    'green': {
+                        'rect': pygame.Rect(2648, 1842, 100, 100),
+                        'active': True
+                    },
+                    'blue': {
+                        'rect': pygame.Rect(2722, 908, 100, 100),
+                        'active': False
+                    },
+                    'orange': {
+                        'rect': pygame.Rect(1700, 672, 100, 100),
+                        'active': False
+                    },
+                    'red': {
+                        'rect': pygame.Rect(2134, 1632, 100, 100),
+                        'active': True
+                    },
+                    'purple': {
+                        'rect': pygame.Rect(2081, 1135, 100, 100),
+                        'active': True
+                    }
+                }
 
                 self.gap_x, self.gap_y = 10, 10
                 self.time_limit = 30
@@ -1215,7 +1267,7 @@ class MapMaestros:
                             exit()
                         if event.type == pygame.MOUSEBUTTONDOWN:
                             if self.exit_button.collidepoint(event.pos):
-                                Maze(self.screen, self.gameStateManager).run()
+                                Maze(self.screen, self.gameStateManager, self.collide_points).run()
             def display_lose_screen(self):
                 # Draw buttons
                 self.screen.blit(self.try_again_image, self.try_again_button.topleft)
@@ -1233,7 +1285,7 @@ class MapMaestros:
                                 self.reset_game()
                                 return
                             elif self.exit_button.collidepoint(event.pos):
-                                Maze(self.screen, self.gameStateManager).run()
+                                Maze(self.screen, self.gameStateManager, self.collide_points).run()
                     pygame.quit()
 
 class MathOlympus:
@@ -1269,7 +1321,32 @@ class MathOlympus:
         pygame.mixer.music.load("bg_music.mp3")
         pygame.mixer.music.play(-1) 
 
-
+        self.collide_points = {
+            'yellow': {
+                'rect': pygame.Rect(1460, 1539, 100, 100),
+                'active': False
+            },
+            'green': {
+                'rect': pygame.Rect(2648, 1842, 100, 100),
+                'active': True
+            },
+            'blue': {
+                'rect': pygame.Rect(2722, 908, 100, 100),
+                'active': False
+            },
+            'orange': {
+                'rect': pygame.Rect(1700, 672, 100, 100),
+                'active': False
+            },
+            'red': {
+                'rect': pygame.Rect(2134, 1632, 100, 100),
+                'active': True
+            },
+            'purple': {
+                'rect': pygame.Rect(2081, 1135, 100, 100),
+                'active': False
+            }
+        }
 
         # Set font settings
         self.pixel_font_display = pygame.font.Font(join('fonts', 'Benguiat.ttf'), 50)
@@ -1814,7 +1891,7 @@ class MathOlympus:
         self.run_game_loop()  # Start the game loop
         self.fade_transition()
         self.fade_out()
-        Maze(self.display_surface, self.gameStateManager).run()
+        Maze(self.display_surface, self.gameStateManager, self.collide_points).run()
 
 class SequenceSurge:
     def __init__(self, display, gameStateManager):
@@ -1831,6 +1908,33 @@ class SequenceSurge:
         self.pixel_font_display = pygame.font.Font(join('fonts','Benguiat.ttf'), 40)
         self.pixel_font_large = pygame.font.Font(join('fonts','Benguiat.ttf'), 28)
         self.pixel_font_small = pygame.font.Font(join('fonts','Benguiat.ttf'), 20)
+
+        self.collide_points = {
+            'yellow': {
+                'rect': pygame.Rect(1460, 1539, 100, 100),
+                'active': True
+            },
+            'green': {
+                'rect': pygame.Rect(2648, 1842, 100, 100),
+                'active': True
+            },
+            'blue': {
+                'rect': pygame.Rect(2722, 908, 100, 100),
+                'active': False
+            },
+            'orange': {
+                'rect': pygame.Rect(1700, 672, 100, 100),
+                'active': False
+            },
+            'red': {
+                'rect': pygame.Rect(2134, 1632, 100, 100),
+                'active': True
+            },
+            'purple': {
+                'rect': pygame.Rect(2081, 1135, 100, 100),
+                'active': False
+            }
+        }
         
         # Score tracking
         self.previous_score = 0
@@ -2058,7 +2162,7 @@ class SequenceSurge:
                         self.show_ready_screen()
                         return True
                     elif exit_button.collidepoint(event.pos):
-                        Maze(self.display, self.gameStateManager).run()
+                        Maze(self.display, self.gameStateManager, self.collide_points).run()
     
     
 
@@ -2237,6 +2341,33 @@ class MazeTrazze:
         self.result_text = ""
         self.used_questions = set()
 
+        self.collide_points = {
+            'yellow': {
+                'rect': pygame.Rect(1460, 1539, 100, 100),
+                'active': True
+            },
+            'green': {
+                'rect': pygame.Rect(2648, 1842, 100, 100),
+                'active': True
+            },
+            'blue': {
+                'rect': pygame.Rect(2722, 908, 100, 100),
+                'active': True
+            },
+            'orange': {
+                'rect': pygame.Rect(1700, 672, 100, 100),
+                'active': False
+            },
+            'red': {
+                'rect': pygame.Rect(2134, 1632, 100, 100),
+                'active': True
+            },
+            'purple': {
+                'rect': pygame.Rect(2081, 1135, 100, 100),
+                'active': True
+            }
+        }
+
         # Passing score threshold
         self.passing_score = 30
 
@@ -2414,7 +2545,7 @@ class MazeTrazze:
                         restart_button_rect = self.draw_game_over()
                         if restart_button_rect.collidepoint(mouse_pos):
                             if self.score >= self.passing_score:
-                                Maze(self.screen, self.gameStateManager).run()
+                                Maze(self.screen, self.gameStateManager, self.collide_points).run()
                             else:
                                 self.level = 1
                                 self.score = 0
