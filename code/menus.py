@@ -93,7 +93,7 @@ class Library:
                 'active': True
             },
             'orange': {
-                'rect': pygame.Rect(1700, 672, 100, 100),
+                'rect': pygame.Rect(1700, 672, 300, 300),
                 'active': True
             },
             'red': {
@@ -369,7 +369,7 @@ class JumbleMania:
                 'active': False
             },
             'green': {
-                'rect': pygame.Rect(2648, 1842, 100, 100),
+                'rect': pygame.Rect(2648, 1842, 300, 300),
                 'active': True
             },
             'blue': {
@@ -829,7 +829,6 @@ class JumbleMania:
                 if event.type == pygame.QUIT:
                     running = False
                     
-
 class MapMaestros:
     class PartOne:
         class MainMenu:
@@ -1167,7 +1166,7 @@ class MapMaestros:
                         'active': True
                     },
                     'purple': {
-                        'rect': pygame.Rect(2081, 1135, 100, 100),
+                        'rect': pygame.Rect(2081, 1135, 300, 300),
                         'active': True
                     }
                 }
@@ -1424,7 +1423,7 @@ class MathOlympus:
                 'active': False
             },
             'green': {
-                'rect': pygame.Rect(2648, 1842, 100, 100),
+                'rect': pygame.Rect(2648, 1842, 300, 300),
                 'active': True
             },
             'blue': {
@@ -1436,7 +1435,7 @@ class MathOlympus:
                 'active': False
             },
             'red': {
-                'rect': pygame.Rect(2134, 1632, 100, 100),
+                'rect': pygame.Rect(2134, 1632, 300, 300),
                 'active': True
             },
             'purple': {
@@ -2038,7 +2037,7 @@ class SequenceSurge:
 
         self.collide_points = {
             'yellow': {
-                'rect': pygame.Rect(1460, 1539, 100, 100),
+                'rect': pygame.Rect(1460, 1539, 300, 300),
                 'active': True
             },
             'green': {
@@ -2478,7 +2477,7 @@ class MazeTrazze:
                 'active': True
             },
             'blue': {
-                'rect': pygame.Rect(2722, 908, 100, 100),
+                'rect': pygame.Rect(2722, 908, 300, 300),
                 'active': True
             },
             'orange': {
