@@ -1347,6 +1347,9 @@ class MathOlympus:
                 'active': False
             }
         }
+        self.instructions_bg = pygame.image.load("instructions.png")
+        self.instructions_bg = pygame.transform.scale(self.instructions_bg, (WINDOW_WIDTH, WINDOW_HEIGHT))
+
 
         # Set font settings
         self.pixel_font_display = pygame.font.Font(join('fonts', 'Benguiat.ttf'), 50)
