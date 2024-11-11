@@ -254,7 +254,8 @@ class Library:
                 self.music.stop()
                 self.transition()
                 self.gameStateManager.set_state('Maze')
-                Maze(self.display_surface, self.gameStateManager, self.maze_collide_points).run()
+                Outro(self.display_surface).run()
+                # Maze(self.display_surface, self.gameStateManager, self.maze_collide_points).run()
             # if self.player.hitbox_rect.colliderect(self.collide_points['locked']):
             #     self.reject_access()
             #     self.gameStateManager.set_state('Library')
@@ -268,7 +269,7 @@ class Library:
             self.dialogue_system.draw_dialogue_box()
             pygame.display.update()
             
-        pygame.quit()
+        MainMenu(self.display_surface, self.gameStateManager)
 
 class Maze:
     def __init__(self, display, gameStateManager, collide_points):
@@ -352,7 +353,7 @@ class Maze:
             
             pygame.display.update()
             
-        pygame.quit()
+        MainMenu(self.display_surface, self.gameStateManager)
 
 class JumbleMania:
     def __init__(self, display, gameStateManager):
@@ -523,7 +524,7 @@ class JumbleMania:
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    pygame.quit()
+                    MainMenu(self.screen, self.gameStateManager)
                     return
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if play_button_rect.collidepoint(event.pos):
@@ -541,7 +542,7 @@ class JumbleMania:
             self.screen.blit(self.background_intro, (0, 0))
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    pygame.quit()
+                    MainMenu(self.screen, self.gameStateManager)
                     return
             pygame.display.flip()
         self.show_instructions()
@@ -734,7 +735,7 @@ class JumbleMania:
 
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
-                        pygame.quit()
+                        MainMenu(self.screen, self.gameStateManager)
                         return
                     elif event.type == pygame.MOUSEBUTTONDOWN:
                         for letter in letters:
@@ -789,7 +790,7 @@ class JumbleMania:
             self.fade_in(self.screen, self.passed_background_image, duration=1.5)
             pygame.time.delay(5000)
             self.stop_all_music()
-            pygame.quit()
+            MainMenu(self.screen, self.gameStateManager)
             return
         else:
             self.fade_in(self.screen, self.failed_background_image, duration=1.5)
@@ -800,7 +801,7 @@ class JumbleMania:
             while True:
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
-                        pygame.quit()
+                        MainMenu(self.screen, self.gameStateManager)
                         return
                     elif event.type == pygame.MOUSEBUTTONDOWN:
                         if play_again_button_rect.collidepoint(event.pos):
@@ -941,7 +942,7 @@ class MapMaestros:
                     pygame.display.flip()
 
                 # Quit Pygame
-                pygame.quit()
+                MainMenu(self.screen, self.gameStateManager)
 
         class Instructions:
             def __init__(self, gameStateManager):
@@ -1019,7 +1020,7 @@ class MapMaestros:
                     # Update the display
                     pygame.display.flip()
 
-                pygame.quit()
+                MainMenu(self.screen, self.gameStateManager)
 
             def transition_to_countdown(self):
                 # Fade out the current screen
@@ -1081,7 +1082,7 @@ class MapMaestros:
                     time.sleep(1)
 
                 # Quit Pygame
-                pygame.quit()
+                MainMenu(self.screen, self.gameStateManager)
 
 
         def transition_to_countdown(self):
@@ -1302,7 +1303,7 @@ class MapMaestros:
             def handle_events(self):
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
-                        pygame.quit()
+                        MainMenu(self.screen, self.gameStateManager)
                         exit()
                     # Handle "Try Again" button click
                     if self.show_try_again and event.type == pygame.MOUSEBUTTONDOWN and self.try_again_button.collidepoint(event.pos):
@@ -1370,7 +1371,7 @@ class MapMaestros:
                 while True:
                     for event in pygame.event.get():
                         if event.type == pygame.QUIT:
-                            pygame.quit()
+                            MainMenu(self.screen, self.gameStateManager)
                             exit()
                         if event.type == pygame.MOUSEBUTTONDOWN:
                             if self.exit_button.collidepoint(event.pos):
@@ -1385,7 +1386,7 @@ class MapMaestros:
                 while True:
                     for event in pygame.event.get():
                         if event.type == pygame.QUIT:
-                            pygame.quit()
+                            MainMenu(self.screen, self.gameStateManager)
                             exit()
                         if event.type == pygame.MOUSEBUTTONDOWN:
                             if self.try_again_button.collidepoint(event.pos):
@@ -1393,7 +1394,7 @@ class MapMaestros:
                                 return
                             elif self.exit_button.collidepoint(event.pos):
                                 Maze(self.screen, self.gameStateManager, self.collide_points).run()
-                    pygame.quit()
+                    MainMenu(self.screen, self.gameStateManager)
 
 class MathOlympus:
     def __init__(self, display, gameStateManager):
@@ -1817,7 +1818,7 @@ class MathOlympus:
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    pygame.quit()
+                    MainMenu(self.screen, self.gameStateManager)
                     return
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
                     self.fade_transition()  
@@ -1938,7 +1939,7 @@ class MathOlympus:
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    pygame.quit()
+                    MainMenu(self.screen, self.gameStateManager)
                     waiting = False
                 if event.type == pygame.KEYDOWN and typing_finished:
                     waiting = False
@@ -2265,8 +2266,7 @@ class SequenceSurge:
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
+                    MainMenu(self.display, self.gameStateManager)
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if button_rect.collidepoint(event.pos):
                         return  # Proceed to the main game
@@ -2290,8 +2290,7 @@ class SequenceSurge:
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
+                    MainMenu(self.display, self.gameStateManager)
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if start_button.collidepoint(event.pos):
                         self.fade_transition()  
@@ -2641,8 +2640,7 @@ class MazeTrazze:
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
+                    MainMenu(self.screen, self.gameStateManager)
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     mouse_pos = pygame.mouse.get_pos()
 
@@ -2704,6 +2702,198 @@ class MazeTrazze:
 
             pygame.display.flip()
             clock.tick(60)
+
+class Outro:
+    def __init__(self, display, gameStateManager):
+        video_path = join('images', 'New.mp4')
+        font_path = join('fonts', 'Benguiat.mp4')
+        button_path = join('images', 'Exit.png')
+        self.music = pygame.mixer.Sound(join('audio', 'BGM', 'something.mp3'))
+        self.gameStateManager = gameStateManager
+        
+        # Video setup
+        self.video_path = video_path
+        self.cap = cv2.VideoCapture(self.video_path)
+        if not self.cap.isOpened():
+            print(f"Error: Unable to open video file: {self.video_path}")
+            MainMenu(self.screen, self.gameStateManager)
+
+        self.fps = self.cap.get(cv2.CAP_PROP_FPS)
+        if self.fps <= 0:
+            print("Error: Invalid FPS value.")
+            MainMenu(self.screen, self.gameStateManager)
+
+        self.frame_delay = int(1000 / self.fps)
+
+        # Screen setup
+        self.target_width = 1280
+        self.target_height = 720
+        self.screen = display
+
+        # Font setup
+        self.font_size = 26
+        if font_path:
+            try:
+                self.font = pygame.font.Font(font_path, self.font_size)
+            except FileNotFoundError:
+                print(f"Font file not found at {font_path}. Using default font.")
+                self.font = pygame.font.Font(None, self.font_size)
+        else:
+            self.font = pygame.font.Font(None, self.font_size)
+
+        # Exit button setup
+        self.exit_button = None
+        if button_path:
+            try:
+                self.exit_button = pygame.image.load(button_path).convert_alpha()
+            except FileNotFoundError:
+                print(f"Error: Exit button image not found at {button_path}.")
+
+        # Define text with timestamps and durations
+        self.text_data = [
+            (2, "Curiosity starts as the seed.", 4.6),
+            (7, "Connection is the roots, which grounds us.", 4),
+            (12, "Insight, as water, that gives nourishment.", 4.6),
+            (16, "Logic is the sun, that provides guidance.", 3),
+            (20, "And the leaves, Expression, which allows us to grow.", 4),
+            (24, "Only when all 5 are together,", 3),
+            (26, 'can produce the "fruit" of Enlightenment.', 6),
+            # Full-screen center-aligned paragraph at 34 seconds with typewriter effect for 5 seconds
+            (34, [
+                "Congratulations, you have obtained all the Stones of Truth.",
+                "Now, go forth. Escape this place.",
+                "",
+                "Live with Curiosity, survive with Logic and Insight,",
+                "through Expression, seek Connection.",
+                "For that is the meaning of Enlightenment."
+            ], 5, True)  # Typewriter effect for 5 seconds
+        ]
+
+        self.text_color = (255, 255, 255)  # White text
+        self.current_text = None  # The currently displayed text
+        self.display_time = 0  # Time when text started displaying
+        self.text_char_index = 0  # Index for typewriter effect
+        self.line_index = 0  # Current line index for multi-line typewriter
+        self.typewriter_time = 0  # Time when typewriter effect started
+        self.fade_alpha = 0  # For fade-out effect
+        self.fade_duration = 1000  # Fade duration in milliseconds
+        self.exit_button_position = (self.target_width // 2 - 50, self.target_height - 100)  # Bottom center
+
+    def fade_out(self):
+        # Gradually fade the screen to black
+        if self.fade_alpha < 255:
+            self.fade_alpha += 5  # Increase alpha to darken the screen
+        else:
+            pygame.time.delay(100)  # Wait for the fade to complete
+            MainMenu(self.screen, self.gameStateManager)
+
+    def run(self):
+        self.music.play(loops = -1)
+        running = True
+        start_time = pygame.time.get_ticks()
+
+        while running and self.cap.isOpened():
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    if self.exit_button and self.exit_button_rect.collidepoint(event.pos):
+                        self.fade_out()  # Start fade-out if exit button is clicked
+
+            # Capture frame
+            ret, frame = self.cap.read()
+            if not ret:
+                break
+
+            # Resize and convert frame for Pygame
+            frame_resized = cv2.resize(frame, (self.target_width, self.target_height))
+            frame_rgb = cv2.cvtColor(frame_resized, cv2.COLOR_BGR2RGB)
+            frame_surface = pygame.surfarray.make_surface(frame_rgb)
+            frame_surface = pygame.transform.rotate(frame_surface, -90)  # Rotate for display
+            frame_surface = pygame.transform.flip(frame_surface, True, False)
+
+            # Display the video frame
+            self.screen.blit(frame_surface, (0, 0))
+
+            # Get elapsed time
+            elapsed_time = (pygame.time.get_ticks() - start_time) / 1000
+
+            # Display the appropriate text
+            for entry in self.text_data:
+                timestamp, text, duration = entry[:3]
+                typewriter_effect = len(entry) > 3 and entry[3]
+
+                if elapsed_time >= timestamp and elapsed_time < timestamp + duration:
+                    if typewriter_effect:
+                        self.current_text = text
+                        self.display_time = duration
+                        self.typewriter_time = elapsed_time  # Start tracking time for typewriter
+                        self.text_char_index = 0  # Reset index for typewriter effect
+                        self.line_index = 0
+                    else:
+                        self.current_text = text
+                        self.display_time = duration
+                        self.text_char_index = len(text)  # Display full text immediately
+                    break
+                else:
+                    self.current_text = None
+
+            
+            # Render the text
+            if self.current_text:
+                line_height = self.font.get_height()
+                line_spacing = 1.5
+                start_y = (self.target_height - line_height * len(self.current_text) * line_spacing) // 2
+
+                if isinstance(self.current_text, list):  # Paragraph with typewriter effect
+                    time_since_start = elapsed_time - self.typewriter_time
+
+                    # Calculate characters to show based on time
+                    total_chars_to_show = int((time_since_start / 5) * sum(len(line) for line in self.current_text))
+
+                    # Update text_char_index ONLY when needed (for typewriter effect)
+                    if self.text_char_index < total_chars_to_show:
+                        self.text_char_index += 1
+
+                    chars_displayed = 0
+                    for i, line in enumerate(self.current_text):
+                        line_length = len(line)
+                        if chars_displayed + line_length <= self.text_char_index:
+                            rendered_text = line
+                        else:
+                            rendered_text = line[:self.text_char_index - chars_displayed]
+                        text_surface = self.font.render(rendered_text, True, self.text_color)
+                        text_rect = text_surface.get_rect(center=(self.target_width // 2, start_y + i * line_height * line_spacing))
+                        self.screen.blit(text_surface, text_rect)
+                        chars_displayed += line_length
+                        # Update line_index for the next line
+                        self.line_index = i + 1
+                else:
+                    text_surface = self.font.render(self.current_text[:self.text_char_index], True, self.text_color)
+                    text_rect = text_surface.get_rect(center=(self.target_width // 2, self.target_height - 50))
+                    self.screen.blit(text_surface, text_rect)
+                    self.text_char_index += 1
+
+            # Display exit button after typewriter effect finishes
+            if elapsed_time >= 34:  # Display exit button after 34 seconds
+                self.exit_button_rect = self.screen.blit(self.exit_button, self.exit_button_position)
+
+
+            # Apply fade-out effect if needed
+            if self.fade_alpha > 0:
+                fade_surface = pygame.Surface((self.target_width, self.target_height))
+                fade_surface.fill((0, 0, 0))
+                fade_surface.set_alpha(self.fade_alpha)
+                self.screen.blit(fade_surface, (0, 0))
+
+            # Update display
+            pygame.display.flip()
+            
+            # Frame rate control
+            pygame.time.delay(self.frame_delay)
+
+        self.cap.release()
+        MainMenu(self.screen, self.gameStateManager)
 
 class CreditsScene:
     def __init__(self, display, gameStateManager):
@@ -2804,5 +2994,4 @@ class CreditsScene:
             self.clock.tick(60)  # Limit frame rate to 60 FPS
 
         # Quit Pygame when done
-        pygame.quit()
-        sys.exit()
+        MainMenu(self.display_surface, self.gameStateManager)
