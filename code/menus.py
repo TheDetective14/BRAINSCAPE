@@ -116,6 +116,8 @@ class Library:
         ]
         self.dialogue_system = DialogueSystem(self.dialogue_lines, self.display_surface, self.font)
 
+        self.music = pygame.mixer.Sound(join('audio', 'BGM', 'library.mp3'))
+
         self.setup()
 
     def setup(self):
@@ -241,6 +243,7 @@ class Library:
             pygame.display.flip()
 
     def run(self):
+        self.music.play(loops = -1)
         while self.running:
             dt = self.clock.tick() / 1000
             for event in pygame.event.get():
@@ -248,6 +251,7 @@ class Library:
                     self.running = False
 
             if self.player.hitbox_rect.colliderect(self.collide_points['maze']):
+                self.music.stop()
                 self.transition()
                 self.gameStateManager.set_state('Maze')
                 Maze(self.display_surface, self.gameStateManager, self.maze_collide_points).run()
@@ -277,8 +281,8 @@ class Maze:
 
         self.collide_points = collide_points
 
-        # self.music = pygame.mixer.Sound(join('audio', 'BGM', 'Background Music.mp3'))
-        # self.music.play(loops = -1)
+        self.music = pygame.mixer.Sound(join('audio', 'BGM', 'maze.mp3'))
+
         self.setup()
 
     def setup(self):
@@ -293,6 +297,7 @@ class Maze:
                 self.player = Player((obj.x, obj.y), self.display_surface, self.all_sprites, self.collision_sprites)
 
     def run(self):
+        self.music.play(loops = -1)
         while self.running:
             dt = self.clock.tick() / 1000
             for event in pygame.event.get():
@@ -309,26 +314,32 @@ class Maze:
             if yellow_point['active'] and self.player.hitbox_rect.colliderect(yellow_point['rect']):
                 self.gameStateManager.set_state('yellow')
                 yellow_point['active'] = False
+                self.music.stop()
                 MathOlympus(self.display_surface, self.gameStateManager).run()
             if green_point['active'] and self.player.hitbox_rect.colliderect(green_point['rect']):
                 self.gameStateManager.set_state('green')
                 green_point['active'] = False
+                self.music.stop()
                 CreditsScene(self.display_surface, self.gameStateManager).run()
             if blue_point['active'] and self.player.hitbox_rect.colliderect(blue_point['rect']):
                 self.gameStateManager.set_state('blue')
                 blue_point['active'] = False
+                self.music.stop()
                 MapMaestros.PartOne.MainMenu(self.display_surface, self.gameStateManager).run()
             if orange_point['active'] and self.player.hitbox_rect.colliderect(orange_point['rect']):
                 self.gameStateManager.set_state('orange')
                 orange_point['active'] = False
+                self.music.stop()
                 MazeTrazze(self.display_surface, self.gameStateManager).run()
             if red_point['active'] and self.player.hitbox_rect.colliderect(red_point['rect']):
                 self.gameStateManager.set_state('red')
                 red_point['active'] = False
+                self.music.stop()
                 JumbleMania(self.display_surface, self.gameStateManager).run()
             if purple_point['active'] and self.player.hitbox_rect.colliderect(purple_point['rect']):
                 self.gameStateManager.set_state('purple')
                 purple_point['active'] = False
+                self.music.stop()
                 SequenceSurge(self.display_surface, self.gameStateManager).run()
             
             # TEMPORARY
@@ -1414,7 +1425,7 @@ class MathOlympus:
         self.instructions_bg = pygame.image.load(join('images', 'trisha',"instructions.png"))
         self.instructions_bg = pygame.transform.scale(self.instructions_bg, (WINDOW_WIDTH, WINDOW_HEIGHT))
 
-        pygame.mixer.music.load(join('audio', 'BGM', 'bg_music.mp3'))
+        pygame.mixer.music.load(join('audio', 'BGM', 'matholymp.mp3'))
         pygame.mixer.music.play(-1) 
 
         self.collide_points = {
@@ -2403,7 +2414,7 @@ class SequenceSurge:
 class MazeTrazze:
     def __init__(self, display, gameStateManager):
         # Set up background music
-        pygame.mixer.music.load(join('audio', 'BGM', 'final_level_Bg.mp3'))  # Load the background music file
+        pygame.mixer.music.load(join('audio', 'BGM', 'maze_trazze.mp3'))  # Load the background music file
         pygame.mixer.music.set_volume(0.5)  # Set the volume (range from 0.0 to 1.0)
         pygame.mixer.music.play(-1)  # Play the music in a loop (-1 means infinite loop)
 

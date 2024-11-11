@@ -6,7 +6,7 @@ class Player(pygame.sprite.Sprite):
         self.display_surface = display
 
         # Load video frames for animation
-        self.frames = self.extract_frames(join('images', 'player.mp4'))  # Replace with your video file path
+        self.frames = self.extract_frames(join('images', 'player_low.mp4'))  # Replace with your video file path
         self.current_frame = 0
         self.frame_count = len(self.frames)
 
