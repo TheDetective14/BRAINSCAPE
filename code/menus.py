@@ -886,20 +886,37 @@ class MapMaestros:
                             if self.exit_button_rect.collidepoint(event.pos):
                                 running = False
 
-                    # Update the frame (for all screens)
                     current_time = pygame.time.get_ticks() / 1000
                     if current_time - self.frame_time >= self.video_duration / (self.fps * 12):
                         self.current_frame = (self.current_frame + 1) % int(self.video_duration * self.fps)
                         self.frame_time = current_time
                         ret, frame = self.video_clip.read()
-                        video_surface = pygame.transform.scale(
-                            pygame.surfarray.make_surface(frame.astype('uint8')),
-                            (int(self.video_width * self.zoom_factor), int(self.video_height * self.zoom_factor))
-                        )
-                        video_surface = pygame.transform.flip(video_surface, True, False)
-                        video_surface = pygame.transform.rotate(video_surface, 90)
-                        x_offset = (WINDOW_WIDTH - video_surface.get_width()) // 2
-                        y_offset = (WINDOW_HEIGHT - video_surface.get_height()) // 2
+
+                        if ret:
+                            # Convert from BGR (OpenCV format) to RGB (Pygame format)
+                            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+                            # Create a Pygame surface from the numpy array
+                            frame_surface = pygame.surfarray.make_surface(frame)
+
+                            # Scale the video surface as needed
+                            video_surface = pygame.transform.scale(
+                                frame_surface,
+                                (int(self.video_width * self.zoom_factor), int(self.video_height * self.zoom_factor))
+                            )
+
+                            # Flip and rotate the video surface
+                            video_surface = pygame.transform.flip(video_surface, True, False)
+                            video_surface = pygame.transform.rotate(video_surface, 90)
+
+                            # Calculate offsets for centering
+                            x_offset = (WINDOW_WIDTH - video_surface.get_width()) // 2
+                            y_offset = (WINDOW_HEIGHT - video_surface.get_height()) // 2
+
+                            # Blit (draw) the video surface onto the display
+                            self.screen.blit(video_surface, (x_offset, y_offset))
+                        else:
+                            pass
 
                     # Draw background
                     self.screen.blit(video_surface, (x_offset, y_offset))
