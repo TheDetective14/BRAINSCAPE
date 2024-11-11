@@ -689,7 +689,7 @@ class JumbleMania:
             running = True
             clock = pygame.time.Clock()
             start_time = time.time()
-            time_limit = 15
+            time_limit = 180
 
             # Positioning code for letters and placeholders
             tile_start_x = self.SIZE[0] // 2 - (100 * len(scrambled) + 10 * (len(scrambled) - 1)) // 2
@@ -820,13 +820,15 @@ class JumbleMania:
                 self.show_score(score)  # Show score and handle play-again option
                 if score >= 3:
                     running = False  # End game if passed
+                    Maze(self.screen, self.gameStateManager, self.collide_points)
                 else:
                     game_state = "intro"  # Restart if failed
 
             # Event handling to check for exit events at each game stage
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    Maze(self.screen, self.gameStateManager, self.collide_points)
+                    running = False
+                    
 
 class MapMaestros:
     class PartOne:
